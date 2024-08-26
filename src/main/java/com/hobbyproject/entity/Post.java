@@ -1,5 +1,6 @@
 package com.hobbyproject.entity;
 
+import com.hobbyproject.dto.post.request.PostEditDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,5 +26,10 @@ public class Post {
         this.title = title;
         this.content = content;
         this.member = member;
+    }
+
+    public void edit(PostEditDto postEditDto) {
+        title=postEditDto.getTitle();
+        content=postEditDto.getContent();
     }
 }

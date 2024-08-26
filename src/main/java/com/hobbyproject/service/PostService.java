@@ -1,7 +1,14 @@
 package com.hobbyproject.service;
 
-import org.springframework.stereotype.Service;
+import com.hobbyproject.dto.post.request.PostEditDto;
+import com.hobbyproject.dto.post.request.PostWriteDto;
 
-@Service
-public class PostService {
+public interface PostService {
+
+
+    void postCreate(PostWriteDto postWriteDto);
+
+    void postEdit(PostEditDto postEditDto);
+
+    void postDelete(Long postId);
 }
