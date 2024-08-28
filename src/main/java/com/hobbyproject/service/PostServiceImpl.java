@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -41,5 +43,10 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
         postRepository.delete(post);
+    }
+
+    @Override
+    public List<Post> findPosts() {
+        return postRepository.findAll();
     }
 }

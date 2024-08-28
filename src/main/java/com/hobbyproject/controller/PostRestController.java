@@ -20,8 +20,8 @@ public class PostRestController {
         postService.postCreate(postWriteDto);
     }
 
-    @PatchMapping("/post/{postId}")
-    public void postEdit(@Valid @ModelAttribute PostEditDto postEditDto, BindingResult bindingResult, Model model){
+    @PostMapping("/post/edit/{postId}")
+    public void postEdit(@PathVariable Long postId ,@Valid @ModelAttribute PostEditDto postEditDto, BindingResult bindingResult, Model model){
         postService.postEdit(postEditDto);
     }
 

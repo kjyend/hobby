@@ -7,31 +7,36 @@
 <body>
 <div style="text-align: center; margin-top: 100px;">
     <h2>회원가입</h2>
-    <form>
+    <form th:action="@{/signup}" method="post">
         <div style="margin-top: 20px;">
-            <label>아이디</label><br>
-            <input type="text" name="username">
+            <label th:for="loginId">아이디</label><br>
+            <input type="text" id="loginId" name="loginId">
         </div>
         <div style="margin-top: 10px;">
-            <label>비밀번호</label><br>
-            <input type="password" name="password">
+            <label th:for="password">비밀번호</label><br>
+            <input type="password" id="password" name="password">
         </div>
         <div style="margin-top: 10px;">
-            <label>비밀번호 체크</label><br>
-            <input type="password" name="passwordConfirm">
+            <label th:for="checkPassword">비밀번호 체크</label><br>
+            <input type="password" id="checkPassword" name="checkPassword">
         </div>
         <div style="margin-top: 10px;">
-            <label>이름</label><br>
-            <input type="text" name="name">
+            <label th:for="name">이름</label><br>
+            <input type="text" id="name" name="name">
         </div>
         <div style="margin-top: 10px;">
-            <label>생일</label><br>
-            <input type="date" name="birthdate">
+            <label th:for="birthday">생일</label><br>
+            <input type="date" id="birthday" name="birthday">
         </div>
         <div style="margin-top: 20px;">
             <button type="submit">가입하기</button>
         </div>
     </form>
+    <div style="margin-top: 10px;">
+        <button onclick="location.href='home.html'"
+                th:onclick="|location.href='@{/}'|"
+                type="button">취소</button>
+    </div>
 </div>
 </body>
 </html>
