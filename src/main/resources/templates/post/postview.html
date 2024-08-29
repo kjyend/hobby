@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>글 보기</title>
+</head>
+<body>
+<div style="text-align: center; margin-top: 100px;">
+    <div th:text="${post}">
+        <h2 th:text="${title}" id="title" name="title">제목</h2>
+        <p th:text="${content}" id="content" name="content">내옹</p>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button th:if="${isLoggedIn}" th:text="${post}" onclick="location.href='postedit.html'"
+                th:onclick="'location.href=@{/post/edit/'+${postId}'"
+                type="button">수정하기</button>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <button  onclick="location.href='home.html'"
+                th:onclick="|location.href='@{/}'|"
+                type="button">취소</button>
+    </div></div>
+</body>
+</html>

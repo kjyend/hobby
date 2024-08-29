@@ -9,11 +9,15 @@ import java.util.List;
 public interface PostService {
 
 
-    void postCreate(PostWriteDto postWriteDto);
+    void postCreate(PostWriteDto postWriteDto,Long id);
 
-    void postEdit(PostEditDto postEditDto);
+    void postEdit(PostEditDto postEditDto, Long id);
 
-    void postDelete(Long postId);
+    void postDelete(Long postId, Long id);
 
     List<Post> findPosts();
+
+    Post findPost(Long postId);
+
+    boolean postMemberCheck(Post post, Long id);
 }

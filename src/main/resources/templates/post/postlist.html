@@ -30,8 +30,13 @@
     <div style="text-align: center; margin-top: 100px;">
         <h2>취미 게시글</h2>
         <span style="float: right;">
-                <a href="#">로그아웃</a>
-                <a href="#" style="margin-left: 15px;">글작성하기</a>
+            <button th:if="${isLoggedIn}" th:action="@{logout}" method="post">로그아웃</button>
+            <button th:if="${!isLoggedIn}" onclick="location.href='login.html'"
+                    th:onclick="|location.href='@{/login}'|"
+                    type="button">로그인</button>
+            <button th:if="${isLoggedIn}" onclick="location.href='postlist.html'"
+                        th:onclick="|location.href='@{/post/write}'|"
+                        type="button">글 작성하기</button>
         </span>
     </div>
     <div class="table-container">
