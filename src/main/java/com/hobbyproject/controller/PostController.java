@@ -1,5 +1,6 @@
 package com.hobbyproject.controller;
 
+import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 import com.hobbyproject.service.PostService;
 import jakarta.servlet.http.HttpSession;
@@ -31,14 +32,18 @@ public class PostController {
     @GetMapping("/post/{postId}")
     public String postView(@PathVariable Long postId, HttpSession session, Model model){
         Post post = postService.findPost(postId);
-        Long memberId = (Long) session.getAttribute("memberId");
+        Member member = (Member) session.getAttribute("memberId");
 
-        boolean check = postService.postMemberCheck(post, memberId);
+        boolean check = false;
+
+        if(member!=null){
+            check=postService.postMemberCheck(post, member);
+        }
 
         boolean isLoggedIn = (session.getAttribute("memberId") != null);
 
-        if(isLoggedIn&&check) {
-            model.addAttribute("isLoggedIn");
+        if(check) {
+            model.addAttribute("isLoggedIn",isLoggedIn);
         }
 
         model.addAttribute("post", post);

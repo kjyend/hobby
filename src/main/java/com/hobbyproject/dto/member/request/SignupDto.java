@@ -2,6 +2,7 @@ package com.hobbyproject.dto.member.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,7 +18,8 @@ public class SignupDto {
     private String checkPassword;
     @NotBlank(message = "이름은 필수입니다.")
     private String name;
-    @NotBlank(message = "생년월일은 필수입니다.")
+    @NotNull(message = "생년월일은 필수입니다.")
+    @Past(message = "생년월일은 과거 날짜여야 합니다.")
     private LocalDate birthday;
 
     @Builder

@@ -2,6 +2,7 @@ package com.hobbyproject.service;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 
 import java.util.List;
@@ -9,15 +10,15 @@ import java.util.List;
 public interface PostService {
 
 
-    void postCreate(PostWriteDto postWriteDto,Long id);
+    void postCreate(PostWriteDto postWriteDto, Member member);
 
-    void postEdit(PostEditDto postEditDto, Long id);
+    void postEdit(PostEditDto postEditDto, Member member);
 
-    void postDelete(Long postId, Long id);
+    void postDelete(Long postId, Member member);
 
     List<Post> findPosts();
 
     Post findPost(Long postId);
 
-    boolean postMemberCheck(Post post, Long id);
+    boolean postMemberCheck(Post post, Member member);
 }

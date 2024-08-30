@@ -21,14 +21,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void postCreate(PostWriteDto postWriteDto,Long id) {
+    public void postCreate(PostWriteDto postWriteDto,Member member) {
 
-        Member member = memberRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
         Post post=Post.builder()
                 .title(postWriteDto.getTitle())
                 .content(postWriteDto.getContent())
-                .member(member)
+                .member(memberCheck)
                 .build();
 
         postRepository.save(post);
@@ -36,13 +36,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void postEdit(PostEditDto postEditDto,Long id) {
+    public void postEdit(PostEditDto postEditDto,Member member) {
 
-        Member member = memberRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
         Post post = postRepository.findById(postEditDto.getPostId()).orElseThrow(IllegalArgumentException::new);
 
-        if (!post.getMember().equals(member)) {
+        if (!post.getMember().equals(memberCheck)) {
             throw new IllegalArgumentException("회원이 일치하지 않습니다.");
         }
 
@@ -53,13 +53,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void postDelete(Long postId,Long id) {
+    public void postDelete(Long postId,Member member) {
 
-        Member member = memberRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
-        if (!post.getMember().equals(member)) {
+        if (!post.getMember().equals(memberCheck)) {
             throw new IllegalArgumentException("회원이 일치하지 않습니다.");
         }
 
@@ -77,11 +77,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public boolean postMemberCheck(Post post, Long id) {
+    public boolean postMemberCheck(Post post, Member member) {
 
-        Member member = memberRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
-        if(post.getMember().equals(member)){
+        if(post.getMember().equals(memberCheck)){
             return true;
         }
         return false;

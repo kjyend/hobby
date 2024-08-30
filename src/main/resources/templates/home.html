@@ -8,9 +8,12 @@
 <div style="text-align: center; margin-top: 100px;">
     <div>
         <h2>메인 화면</h2>
-        <button onclick="location.href='login.html'"
+        <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post">
+            <button type="submit">로그아웃</button>
+        </form>
+        <button th:if="${!isLoggedIn}" onclick="location.href='login.html'"
                 th:onclick="|location.href='@{/login}'|"
-                type="button">로그인하기</button>
+                type="button">로그인</button>
     </div>
     <div style="margin-top: 50px;">
         <button onclick="location.href='postlist.html'"

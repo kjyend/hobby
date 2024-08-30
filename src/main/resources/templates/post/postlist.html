@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>취미 게시글</title>
     <style>
+        .button-container button {
+            display: inline-block;
+            margin-right: 10px; /* 버튼 사이에 여백 추가 */
+            float: right;
+        }
         .container {
             text-align: center;
             margin-top: 50px;
@@ -29,15 +34,18 @@
 <div class="container">
     <div style="text-align: center; margin-top: 100px;">
         <h2>취미 게시글</h2>
-        <span style="float: right;">
-            <button th:if="${isLoggedIn}" th:action="@{logout}" method="post">로그아웃</button>
+        <div class="button-container">
+            <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post">
+                <button type="submit">로그아웃</button>
+            </form>
+            <button th:if="${isLoggedIn}" onclick="location.href='postlist.html'"
+                    th:onclick="|location.href='@{/post/write}'|"
+                    type="button">글 작성하기</button>
             <button th:if="${!isLoggedIn}" onclick="location.href='login.html'"
                     th:onclick="|location.href='@{/login}'|"
                     type="button">로그인</button>
-            <button th:if="${isLoggedIn}" onclick="location.href='postlist.html'"
-                        th:onclick="|location.href='@{/post/write}'|"
-                        type="button">글 작성하기</button>
-        </span>
+
+        </div>
     </div>
     <div class="table-container">
         <table>
@@ -49,9 +57,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="post:${posts}">
+            <tr th:each="post:${posts}" th:action="@{/post/{postId}(postId=${post.postId})}" class="get">
                 <td th:text="${post.postId}"></td>
-                <td th:text="${post.title}"></td>
+                <td>
+                    <a th:href="@{/post/{postId}(postId=${post.postId})}" th:text="${post.title}"></a>
+                </td>
                 <td th:text="${post.content}"></td>
             </tr>
             </tbody>
