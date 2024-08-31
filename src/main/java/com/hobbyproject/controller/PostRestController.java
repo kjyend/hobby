@@ -24,13 +24,13 @@ public class PostRestController {
     }
 
     @PostMapping("/post/edit/{postId}")
-    public void postEdit(@Valid @ModelAttribute PostEditDto postEditDto, BindingResult bindingResult,@PathVariable Long postId , Model model, HttpSession session){
+    public void postEdit(@Valid @ModelAttribute PostEditDto postEditDto, BindingResult bindingResult,@PathVariable("postId") Long postId , Model model, HttpSession session){
         Member member = (Member) session.getAttribute("memberId");
         postService.postEdit(postEditDto,member);
     }
 
     @DeleteMapping("/post/{postId}")
-    public void postDelete(@PathVariable Long postId, HttpSession session){
+    public void postDelete(@PathVariable("postId") Long postId, HttpSession session){
         Member member = (Member) session.getAttribute("memberId");
         postService.postDelete(postId,member);
     }

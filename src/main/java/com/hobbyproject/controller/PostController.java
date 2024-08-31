@@ -30,7 +30,7 @@ public class PostController {
     }
 
     @GetMapping("/post/{postId}")
-    public String postView(@PathVariable Long postId, HttpSession session, Model model){
+    public String postView(@PathVariable("postId") Long postId, HttpSession session, Model model){
         Post post = postService.findPost(postId);
         Member member = (Member) session.getAttribute("memberId");
 
@@ -51,7 +51,7 @@ public class PostController {
     }
 
     @GetMapping("/post/edit/{postId}")
-    public String postEdit(@PathVariable Long postId, Model model){
+    public String postEdit(@PathVariable("postId") Long postId, Model model){
         model.addAttribute("postId", postId);
         return "post/postedit";
     }
