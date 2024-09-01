@@ -1,5 +1,6 @@
 package com.hobbyproject.dto.member.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -22,8 +23,11 @@ public class SignupDto {
     @Past(message = "생년월일은 과거 날짜여야 합니다.")
     private LocalDate birthday;
 
+    public SignupDto(){
+    }
+
     @Builder
-    public SignupDto(String loginId, String password, String checkPassword, String name, LocalDate birthday) {
+    public SignupDto(String loginId,String password,String checkPassword,String name, LocalDate birthday) {
         this.loginId = loginId;
         this.password = password;
         this.checkPassword = checkPassword;

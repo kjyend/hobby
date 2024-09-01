@@ -12,6 +12,8 @@ public class LoginDto {
     @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 
+    public LoginDto(){
+    }
     @Builder
     public LoginDto(String loginId, String password) {
         this.loginId = loginId;
