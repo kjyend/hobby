@@ -12,9 +12,9 @@ public interface PostService {
 
     void postCreate(PostWriteDto postWriteDto, Member member);
 
-    void postEdit(PostEditDto postEditDto, Member member);
+    boolean postEdit(PostEditDto postEditDto, Member member);
 
-    void postDelete(Long postId, Member member);
+    boolean postDelete(Long postId, Member member);
 
     List<Post> findPosts();
 

@@ -36,36 +36,45 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void postEdit(PostEditDto postEditDto,Member member) {
+    public boolean postEdit(PostEditDto postEditDto,Member member) {
+        try {
+            Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
-        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
+            Post post = postRepository.findById(postEditDto.getPostId()).orElseThrow(IllegalArgumentException::new);
 
-        Post post = postRepository.findById(postEditDto.getPostId()).orElseThrow(IllegalArgumentException::new);
+            if (!post.getMember().equals(memberCheck)) {
+                throw new IllegalArgumentException("회원이 일치하지 않습니다.");
+            }
 
-        if (!post.getMember().equals(memberCheck)) {
-            throw new IllegalArgumentException("회원이 일치하지 않습니다.");
+            post.edit(postEditDto);
+
+            postRepository.save(post);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
-
-        post.edit(postEditDto);
-
-        postRepository.save(post);
     }
 
     @Override
     @Transactional
-    public void postDelete(Long postId,Member member) {
+    public boolean postDelete(Long postId, Member member) {
+        try {
+            Member memberCheck = memberRepository.findById(member.getMemberId())
+                    .orElseThrow(() -> new IllegalArgumentException("회원이 일치하지 않습니다."));
 
-        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
-        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+            if (!post.getMember().equals(memberCheck)) {
+                throw new IllegalArgumentException("회원이 일치하지 않습니다.");
+            }
 
-        if (!post.getMember().equals(memberCheck)) {
-            throw new IllegalArgumentException("회원이 일치하지 않습니다.");
+            postRepository.delete(post);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
-
-        postRepository.delete(post);
     }
-
     @Override
     public List<Post> findPosts() {
         return postRepository.findAll();

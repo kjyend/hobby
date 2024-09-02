@@ -7,6 +7,7 @@ import com.hobbyproject.service.PostService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -18,20 +19,28 @@ public class PostRestController {
     private final PostService postService;
 
     @PostMapping("/post/write")
-    public void postWrite(@Valid @ModelAttribute PostWriteDto postWriteDto, BindingResult bindingResult, Model model, HttpSession session){
+    public void postWrite(@Valid @RequestBody PostWriteDto postWriteDto, BindingResult bindingResult, HttpSession session){
         Member member = (Member) session.getAttribute("memberId");
         postService.postCreate(postWriteDto,member);
     }
 
     @PostMapping("/post/edit/{postId}")
-    public void postEdit(@Valid @ModelAttribute PostEditDto postEditDto, BindingResult bindingResult,@PathVariable("postId") Long postId , Model model, HttpSession session){
+    public ResponseEntity<String> postEdit(@PathVariable("postId") Long postId, @Valid @RequestBody PostEditDto postEditDto, BindingResult bindingResult, HttpSession session){
         Member member = (Member) session.getAttribute("memberId");
-        postService.postEdit(postEditDto,member);
+        if(postService.postEdit(postEditDto,member)){
+            return ResponseEntity.ok("Post 삭제에 성공했습니다.");
+        }else{
+            return ResponseEntity.badRequest().body("Post 삭제에 실패했습니다.");
+        }
     }
 
     @DeleteMapping("/post/{postId}")
-    public void postDelete(@PathVariable("postId") Long postId, HttpSession session){
+    public ResponseEntity<String> postDelete(@PathVariable("postId") Long postId, HttpSession session){
         Member member = (Member) session.getAttribute("memberId");
-        postService.postDelete(postId,member);
+        if (postService.postDelete(postId, member)) {
+            return ResponseEntity.ok("Post 삭제에 성공했습니다.");
+        } else {
+            return ResponseEntity.badRequest().body("Post 삭제에 실패했습니다.");
+        }
     }
 }

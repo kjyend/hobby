@@ -12,6 +12,9 @@ public class PostWriteDto {
     @NotBlank(message = "내용은 필수입니다.")
     private String content;
 
+    public PostWriteDto(){
+    }
+
     @Builder
     public PostWriteDto(String title, String content) {
         this.title = title;
