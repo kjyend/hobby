@@ -60,6 +60,13 @@ class LoginRestControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
 
+        assertEquals(1L, memberRepository.count());
+
+        Member member = memberRepository.findAll().get(0);
+
+        assertEquals("asd123", member.getLoginId());
+        assertEquals("qqq111", member.getPassword());
+
     }
 
     @Test

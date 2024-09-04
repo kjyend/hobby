@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
@@ -88,9 +89,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public boolean postMemberCheck(Post post, Member member) {
 
-        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
+        memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
-        if(post.getMember().equals(memberCheck)){
+        if(post.getMember().equals(member)){
             return true;
         }
         return false;
