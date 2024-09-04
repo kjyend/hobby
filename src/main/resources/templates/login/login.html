@@ -36,13 +36,11 @@
     function submitLogin() {
         const form = document.getElementById('loginForm');
 
-        // 폼 데이터를 JSON 객체로 변환
         const formData = {
             loginId: form.loginId.value,
             password: form.password.value
         };
 
-        // JSON 데이터를 서버에 POST 요청으로 전송
         fetch('/login', {
             method: 'POST',
             headers: {
@@ -53,7 +51,7 @@
             .then(response => {
                 if (response.ok) {
                     alert("로그인 성공!");
-                    window.location.href = '/'; // 성공 시 리디렉션
+                    window.location.href = '/';
                 } else {
                     return response.json().then(data => {
                         // 서버에서 받은 에러 메시지 표시

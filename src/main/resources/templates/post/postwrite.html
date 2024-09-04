@@ -48,10 +48,9 @@
             .then(response => {
                 if (response.ok) {
                     alert("글이 성공적으로 작성되었습니다!");
-                    window.location.href = '/post'; // 성공 시 리디렉션
+                    window.location.href = '/post';
                 } else {
                     return response.json().then(data => {
-                        // 서버에서 받은 에러 메시지 표시
                         alert("에러: " + data.map(error => error.defaultMessage).join("\n"));
                     });
                 }
