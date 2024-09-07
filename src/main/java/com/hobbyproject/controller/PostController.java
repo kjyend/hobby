@@ -40,8 +40,6 @@ public class PostController {
                 model.addAttribute("isLoggedIn", isLoggedIn);
 
             }
-            System.out.println("member.getLoginId()"+member.getLoginId());
-            System.out.println("member.getPassword()"+member.getPassword());
         }
 
         model.addAttribute("post", post);
