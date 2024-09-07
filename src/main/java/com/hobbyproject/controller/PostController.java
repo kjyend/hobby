@@ -34,16 +34,14 @@ public class PostController {
         Post post = postService.findPost(postId);
         Member member = (Member) session.getAttribute("memberId");
 
-        boolean check = false;
-
         if(member!=null){
-            check=postService.postMemberCheck(post, member);
-        }
+            if(postService.postMemberCheck(post, member)) {
+                boolean isLoggedIn = (session.getAttribute("memberId") != null);
+                model.addAttribute("isLoggedIn", isLoggedIn);
 
-        boolean isLoggedIn = (session.getAttribute("memberId") != null);
-
-        if(check) {
-            model.addAttribute("isLoggedIn",isLoggedIn);
+            }
+            System.out.println("member.getLoginId()"+member.getLoginId());
+            System.out.println("member.getPassword()"+member.getPassword());
         }
 
         model.addAttribute("post", post);

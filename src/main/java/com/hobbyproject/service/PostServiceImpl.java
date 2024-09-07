@@ -91,7 +91,7 @@ public class PostServiceImpl implements PostService {
 
         memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
-        if(post.getMember().equals(member)){
+        if(post.getMember().getMemberId().equals(member.getMemberId())){
             return true;
         }
         return false;
