@@ -1,7 +1,9 @@
 package com.hobbyproject.service;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
+import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 import com.hobbyproject.repository.MemberRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -95,5 +98,12 @@ public class PostServiceImpl implements PostService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<PostResponseDto> getList(PostSearchDto postSearch) {
+        return postRepository.getList(postSearch).stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
     }
 }

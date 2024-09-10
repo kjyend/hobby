@@ -1,7 +1,9 @@
 package com.hobbyproject.controller;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
+import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.service.PostService;
 import jakarta.servlet.http.HttpSession;
@@ -12,11 +14,18 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class PostRestController {
 
     private final PostService postService;
+
+    @GetMapping("/posts")
+    public List<PostResponseDto> getList(@RequestBody PostSearchDto postSearch){
+        return postService.getList(postSearch);
+    }
 
     @PostMapping("/post/write")
     public void postWrite(@Valid @RequestBody PostWriteDto postWriteDto, BindingResult bindingResult, HttpSession session){

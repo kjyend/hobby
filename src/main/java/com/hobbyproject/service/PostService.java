@@ -1,7 +1,9 @@
 package com.hobbyproject.service;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
+import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 
@@ -21,4 +23,6 @@ public interface PostService {
     Post findPost(Long postId);
 
     boolean postMemberCheck(Post post, Member member);
+
+    List<PostResponseDto> getList(PostSearchDto postSearch);
 }
