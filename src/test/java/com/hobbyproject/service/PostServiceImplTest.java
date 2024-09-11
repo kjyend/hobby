@@ -52,7 +52,7 @@ class PostServiceImplTest {
                 .content("내용입니다.")
                 .build();
 
-        postService.postCreate(postWriteDto,member);
+        postService.postCreate(postWriteDto,member,null);
 
         assertEquals(1L, postRepository.count());
 

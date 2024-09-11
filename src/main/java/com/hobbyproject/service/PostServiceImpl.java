@@ -11,6 +11,7 @@ import com.hobbyproject.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,10 +23,11 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final UploadFileService uploadFileService;
 
     @Override
     @Transactional
-    public void postCreate(PostWriteDto postWriteDto,Member member) {
+    public void postCreate(PostWriteDto postWriteDto,Member member,List<MultipartFile> images) {
 
         Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
@@ -36,6 +38,8 @@ public class PostServiceImpl implements PostService {
                 .build();
 
         postRepository.save(post);
+
+        uploadFileService.uploadFile(post,images);
     }
 
     @Override

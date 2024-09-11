@@ -10,9 +10,9 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ public class PostRestController {
     }
 
     @PostMapping("/post/write")
-    public void postWrite(@Valid @RequestBody PostWriteDto postWriteDto, BindingResult bindingResult, HttpSession session){
+    public void postWrite(@Valid @RequestParam("images") List<MultipartFile> images, @Valid @ModelAttribute PostWriteDto postWriteDto, BindingResult bindingResult, HttpSession session){
         Member member = (Member) session.getAttribute("memberId");
-        postService.postCreate(postWriteDto,member);
+        postService.postCreate(postWriteDto,member,images);
     }
 
     @PostMapping("/post/edit/{postId}")
@@ -51,5 +51,10 @@ public class PostRestController {
         } else {
             return ResponseEntity.badRequest().body("Post 삭제에 실패했습니다.");
         }
+    }
+
+    @PostMapping("/upload")
+    public String saveFile(){
+        return null;
     }
 }

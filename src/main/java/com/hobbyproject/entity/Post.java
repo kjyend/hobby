@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,6 +24,9 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<UploadFile> uploadFiles = new ArrayList<>();
 
     @Builder
     public Post(Long postId, String title, String content, Member member) {

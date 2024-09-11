@@ -6,13 +6,14 @@ import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface PostService {
 
 
-    void postCreate(PostWriteDto postWriteDto, Member member);
+    void postCreate(PostWriteDto postWriteDto, Member member,List<MultipartFile> images);
 
     boolean postEdit(PostEditDto postEditDto, Member member);
 
