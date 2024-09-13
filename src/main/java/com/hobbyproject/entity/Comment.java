@@ -28,7 +28,7 @@ public class Comment {
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne

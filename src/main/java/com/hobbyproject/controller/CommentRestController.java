@@ -5,14 +5,11 @@ import com.hobbyproject.entity.Member;
 import com.hobbyproject.service.CommentService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-public class CommentController {
+public class CommentRestController {
 
     private final CommentService commentService;
 
@@ -22,8 +19,8 @@ public class CommentController {
         commentService.commentCreate(createdComment, postId, member);
     }
 
-    @PostMapping("/post/{postId}/comment/{commentId}")
-    public void deleteComment(@PathVariable Long postId,@PathVariable Long commentId){
+    @DeleteMapping("/post/{postId}/comment/{commentId}")
+    public void deleteComment(@PathVariable("postId") Long postId,@PathVariable("commentId") Long commentId){
         commentService.deleteComment(commentId);
     }
 

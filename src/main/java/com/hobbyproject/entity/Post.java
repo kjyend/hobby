@@ -28,6 +28,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<UploadFile> uploadFiles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private List<Comment> comments=new ArrayList<>();
+
     @Builder
     public Post(Long postId, String title, String content, Member member) {
         this.postId = postId;

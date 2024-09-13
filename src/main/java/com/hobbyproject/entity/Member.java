@@ -26,6 +26,9 @@ public class Member {
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Post> posts=new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
     @Builder
     public Member(Long memberId, String loginId, String password, String name, LocalDate birthday) {
         this.memberId = memberId;

@@ -22,6 +22,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final DatePath<java.time.LocalDate> birthday = createDate("birthday", java.time.LocalDate.class);
 
+    public final ListPath<Comment, QComment> comments = this.<Comment, QComment>createList("comments", Comment.class, QComment.class, PathInits.DIRECT2);
+
     public final StringPath loginId = createString("loginId");
 
     public final NumberPath<Long> memberId = createNumber("memberId", Long.class);
