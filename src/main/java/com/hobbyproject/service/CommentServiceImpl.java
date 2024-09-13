@@ -1,6 +1,7 @@
 package com.hobbyproject.service;
 
 import com.hobbyproject.dto.comment.request.CreatedComment;
+import com.hobbyproject.dto.comment.response.CommentResponseDto;
 import com.hobbyproject.entity.Comment;
 import com.hobbyproject.entity.DeleteStatus;
 import com.hobbyproject.entity.Member;
@@ -11,6 +12,8 @@ import com.hobbyproject.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -52,10 +55,21 @@ public class CommentServiceImpl implements CommentService{
             commentRepository.delete(getDeletableAncestorComment(comment));
         }
     }
+
     private Comment getDeletableAncestorComment(Comment comment) {
         Comment parent = comment.getParent();
         if(parent != null && parent.getReplies().size() == 1 && parent.getIsDeleted() == DeleteStatus.YES)
             return getDeletableAncestorComment(parent);
+        return comment;
+    }
+
+    @Override
+    public List<CommentResponseDto> getList(Long postId) {
+        List<CommentResponseDto> comment = commentRepository.getComment(postId);
+
+        for (CommentResponseDto commentResponseDto : comment) {
+            System.out.println("commentResponseDto.getContent() = " + commentResponseDto.getContent());
+        }
         return comment;
     }
 }
