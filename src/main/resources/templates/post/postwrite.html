@@ -7,14 +7,18 @@
 <body>
 <div style="text-align: center; margin-top: 100px;">
     <h2>글 작성하기</h2>
-    <form id="postWriteForm">
+    <form id="postWriteForm" enctype="multipart/form-data">
         <div style="margin-top: 20px;">
             <label for="title">제목</label>
-            <input type="text" id="title" name="title">
+            <input type="text" id="title" name="title" required>
         </div>
         <div style="margin-top: 10px;">
             <label for="content">내용</label>
-            <textarea id="content" name="content"></textarea>
+            <textarea id="content" name="content" required></textarea>
+        </div>
+        <div style="margin-top: 10px;">
+            <label for="images">이미지 업로드</label>
+            <input type="file" id="images" name="images" multiple accept="image/*">
         </div>
         <div style="margin-top: 20px;">
             <button type="button" onclick="submitPost()">작성하기</button>
@@ -30,20 +34,11 @@
 <script>
     function submitPost() {
         const form = document.getElementById('postWriteForm');
+        const formData = new FormData(form);
 
-        // 폼 데이터를 JSON 객체로 변환
-        const formData = {
-            title: form.title.value,
-            content: form.content.value
-        };
-
-        // JSON 데이터를 서버에 POST 요청으로 전송
         fetch('/post/write', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
+            body: formData,
         })
             .then(response => {
                 if (response.ok) {

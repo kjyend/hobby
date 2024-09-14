@@ -28,18 +28,26 @@ public class PostRestController {
     }
 
     @PostMapping("/post/write")
-    public void postWrite(@Valid @RequestParam("images") List<MultipartFile> images, @Valid @ModelAttribute PostWriteDto postWriteDto, BindingResult bindingResult, HttpSession session){
+    public void postWrite(@Valid @RequestParam("images") List<MultipartFile> images,@Valid @ModelAttribute PostWriteDto postWriteDto, BindingResult bindingResult, HttpSession session){
+        if (bindingResult.hasErrors()) {
+            throw new RuntimeException("유효성 검사 실패");
+        }
+
         Member member = (Member) session.getAttribute("memberId");
         postService.postCreate(postWriteDto,member,images);
     }
 
     @PostMapping("/post/edit/{postId}")
-    public ResponseEntity<String> postEdit(@PathVariable("postId") Long postId, @Valid @RequestBody PostEditDto postEditDto, BindingResult bindingResult, HttpSession session){
-        Member member = (Member) session.getAttribute("memberId");
-        if(postService.postEdit(postEditDto,member)){
-            return ResponseEntity.ok("Post 삭제에 성공했습니다.");
-        }else{
-            return ResponseEntity.badRequest().body("Post 삭제에 실패했습니다.");
+    public ResponseEntity<String> postEdit(@PathVariable("postId") Long postId, @RequestParam("images") List<MultipartFile> images, @Valid @ModelAttribute PostEditDto postEditDto, BindingResult bindingResult, HttpSession session){
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("유효성 검사에 실패했습니다.");
+        }
+
+    Member member = (Member) session.getAttribute("memberId");
+        if(postService.postEdit(postEditDto, member, images)){
+        return ResponseEntity.ok("Post 수정에 성공했습니다.");
+    }else{
+        return ResponseEntity.badRequest().body("Post 수정에 실패했습니다.");
         }
     }
 
@@ -53,8 +61,4 @@ public class PostRestController {
         }
     }
 
-    @PostMapping("/upload")
-    public String saveFile(){
-        return null;
-    }
 }

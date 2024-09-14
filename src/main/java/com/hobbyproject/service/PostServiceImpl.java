@@ -44,7 +44,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public boolean postEdit(PostEditDto postEditDto,Member member) {
+    public boolean postEdit(PostEditDto postEditDto,Member member,List<MultipartFile> images) {
         try {
             Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
@@ -57,6 +57,8 @@ public class PostServiceImpl implements PostService {
             post.edit(postEditDto);
 
             postRepository.save(post);
+
+            uploadFileService.uploadFile(post,images);
             return true;
         } catch (IllegalArgumentException e) {
             return false;

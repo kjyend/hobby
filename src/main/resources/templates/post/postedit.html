@@ -7,14 +7,18 @@
 <body>
 <div style="text-align: center; margin-top: 100px;">
     <h2>글 수정하기</h2>
-    <form id="postEditForm">
+    <form id="postEditForm" enctype="multipart/form-data">
         <div style="margin-top: 20px;">
             <label for="title">제목</label>
-            <input type="text" id="title" name="title">
+            <input type="text" id="title" name="title" required>
         </div>
         <div style="margin-top: 10px;">
             <label for="content">내용</label>
-            <textarea id="content" name="content"></textarea>
+            <textarea id="content" name="content" required></textarea>
+        </div>
+        <div style="margin-top: 10px;">
+            <label for="images">이미지 파일</label>
+            <input type="file" id="images" name="images" multiple accept="image/*">
         </div>
         <div style="margin-top: 20px;">
             <button type="button" th:onclick="'submitEdit(' + ${postId} + ');'">수정하기</button>
@@ -29,19 +33,13 @@
 <script>
     function submitEdit(postId) {
         const form = document.getElementById('postEditForm');
+        const formData = new FormData(form);
 
-        const formData = {
-            postId : postId,
-            title: form.title.value,
-            content: form.content.value
-        };
+        formData.append("postId", postId);
 
         fetch(`/post/edit/${postId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
+            body: formData
         })
             .then(response => {
                 if (response.ok) {

@@ -89,7 +89,7 @@ class PostServiceImplTest {
                 .content("변경된 내용입니다.")
                 .build();
 
-        boolean result = postService.postEdit(postEditDto, member);
+        boolean result = postService.postEdit(postEditDto, member,null);
 
         assertTrue(result);
     }
@@ -129,7 +129,7 @@ class PostServiceImplTest {
                 .content("변경된 내용입니다.")
                 .build();
 
-        boolean result = postService.postEdit(postEditDto, member2);
+        boolean result = postService.postEdit(postEditDto, member2,null);
 
         assertFalse(result);
     }
@@ -153,7 +153,7 @@ class PostServiceImplTest {
                 .build();
 
 
-        boolean result = postService.postEdit(postEditDto, member);
+        boolean result = postService.postEdit(postEditDto, member,null);
 
         assertFalse(result);
     }

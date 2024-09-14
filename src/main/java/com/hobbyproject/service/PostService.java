@@ -15,7 +15,7 @@ public interface PostService {
 
     void postCreate(PostWriteDto postWriteDto, Member member,List<MultipartFile> images);
 
-    boolean postEdit(PostEditDto postEditDto, Member member);
+    boolean postEdit(PostEditDto postEditDto, Member member,List<MultipartFile> images);
 
     boolean postDelete(Long postId, Member member);
 
