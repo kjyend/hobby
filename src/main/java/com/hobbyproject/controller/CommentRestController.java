@@ -29,8 +29,12 @@ public class CommentRestController {
     }
 
     @DeleteMapping("/post/{postId}/comment/{commentId}")
-    public void deleteComment(@PathVariable("postId") Long postId,@PathVariable("commentId") Long commentId){
-        commentService.deleteComment(commentId);
+    public void deleteComment(@PathVariable("postId") Long postId,@PathVariable("commentId") Long commentId,HttpSession session){
+        Member member = (Member) session.getAttribute("memberId");
+
+        if (commentService.isCommentOwner(commentId, member)) {
+            commentService.deleteComment(commentId);
+        }
     }
 
 }

@@ -58,7 +58,7 @@ public class CommentServiceImpl implements CommentService{
 
     private Comment getDeletableAncestorComment(Comment comment) {
         Comment parent = comment.getParent();
-        if(parent != null && parent.getReplies().size() == 1 && parent.getIsDeleted() == DeleteStatus.YES)
+        if(parent != null && parent.getIsDeleted() == DeleteStatus.YES)
             return getDeletableAncestorComment(parent);
         return comment;
     }
@@ -71,5 +71,11 @@ public class CommentServiceImpl implements CommentService{
             System.out.println("commentResponseDto.getContent() = " + commentResponseDto.getContent());
         }
         return comment;
+    }
+
+    @Override
+    public boolean isCommentOwner(Long commentId, Member member) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+        return comment.getMember().getMemberId().equals(member.getMemberId());
     }
 }

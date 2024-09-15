@@ -12,4 +12,6 @@ public interface CommentService {
     void deleteComment(Long commentId);
 
     List<CommentResponseDto> getList(Long postId);
+
+    boolean isCommentOwner(Long commentId, Member member);
 }
