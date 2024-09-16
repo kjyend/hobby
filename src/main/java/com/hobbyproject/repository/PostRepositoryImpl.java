@@ -21,4 +21,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .orderBy(QPost.post.postId.desc())
                 .fetch();
     }
+
+    @Override
+    public long count() {
+        return jpaQueryFactory.selectFrom(QPost.post).fetchCount();
+    }
 }

@@ -3,6 +3,7 @@ package com.hobbyproject.service;
 import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
@@ -38,8 +39,9 @@ public class PostServiceImpl implements PostService {
                 .build();
 
         postRepository.save(post);
-
-        uploadFileService.uploadFile(post,images);
+        if(images!=null) {
+            uploadFileService.uploadFile(post, images);
+        }
     }
 
     @Override
@@ -107,9 +109,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponseDto> getList(PostSearchDto postSearch) {
-        return postRepository.getList(postSearch).stream()
-                .map(PostResponseDto::new)
-                .collect(Collectors.toList());
+    public PostPagingResponse getList(PostSearchDto postSearch) {
+        List<Post> posts = postRepository.getList(postSearch);
+        long totalPostCount = postRepository.count();
+
+        return new PostPagingResponse(posts.stream().map(PostResponseDto::new).collect(Collectors.toList()), totalPostCount);
     }
 }

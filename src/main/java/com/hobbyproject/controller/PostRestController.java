@@ -3,6 +3,7 @@ package com.hobbyproject.controller;
 import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.service.PostService;
@@ -14,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +26,9 @@ public class PostRestController {
     private final PostService postService;
 
     @GetMapping("/posts")
-    public List<PostResponseDto> getList(@RequestBody PostSearchDto postSearch){
+    public PostPagingResponse getList(@RequestParam(name = "page",defaultValue = "1") int page,
+                                      @RequestParam(name = "size",defaultValue = "10") int size) {
+        PostSearchDto postSearch = new PostSearchDto(page, size);
         return postService.getList(postSearch);
     }
 
