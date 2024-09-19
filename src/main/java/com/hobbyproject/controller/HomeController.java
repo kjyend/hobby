@@ -1,7 +1,7 @@
 package com.hobbyproject.controller;
 
-import com.hobbyproject.entity.Member;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     @GetMapping("/")
-    public String home(HttpSession session, Model model){
+    public String home(@AuthenticationPrincipal UserDetails userDetails, Model model) {
 
-        boolean isLoggedIn = (session.getAttribute("memberId") != null);
+        boolean isLoggedIn = userDetails != null;
 
-        model.addAttribute("isLoggedIn",isLoggedIn);
+        model.addAttribute("isLoggedIn", isLoggedIn);
 
         return "home";
+
     }
-
-
 }

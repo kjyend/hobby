@@ -4,8 +4,6 @@ import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
-import com.hobbyproject.dto.post.response.PostResponseDto;
-import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,17 +12,16 @@ import java.util.List;
 public interface PostService {
 
 
-    void postCreate(PostWriteDto postWriteDto, Member member,List<MultipartFile> images);
+    void postCreate(PostWriteDto postWriteDto, String loginId, List<MultipartFile> images);
 
-    boolean postEdit(PostEditDto postEditDto, Member member,List<MultipartFile> images);
+    boolean postEdit(PostEditDto postEditDto, String loginId, List<MultipartFile> images);
 
-    boolean postDelete(Long postId, Member member);
+    boolean postDelete(Long postId, String loginId);
 
-    List<Post> findPosts();
 
     Post findPost(Long postId);
 
-    boolean postMemberCheck(Post post, Member member);
+    boolean postMemberCheck(Post post, String loginId);
 
     PostPagingResponse getList(PostSearchDto postSearch);
 }

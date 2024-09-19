@@ -26,10 +26,10 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void commentCreate(CreatedComment createdComment, Long postId, Member member) {
+    public void commentCreate(CreatedComment createdComment, Long postId, String loginId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
-        Member writer = memberRepository.findById(member.getMemberId()).orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
+        Member writer = memberRepository.findByLoginId(loginId).orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
         Comment parent=null;
         if(createdComment.getParentId()!=null){
             parent=commentRepository.findById(createdComment.getParentId()).orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
@@ -74,8 +74,8 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public boolean isCommentOwner(Long commentId, Member member) {
+    public boolean isCommentOwner(Long commentId, String loginId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
-        return comment.getMember().getMemberId().equals(member.getMemberId());
+        return comment.getMember().getLoginId().equals(loginId);
     }
 }

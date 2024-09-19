@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -28,9 +29,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void postCreate(PostWriteDto postWriteDto,Member member,List<MultipartFile> images) {
+    public void postCreate(PostWriteDto postWriteDto, String loginId, List<MultipartFile> images) {
 
-        Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
+        Member memberCheck = memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
 
         Post post=Post.builder()
                 .title(postWriteDto.getTitle())
@@ -46,9 +47,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public boolean postEdit(PostEditDto postEditDto,Member member,List<MultipartFile> images) {
+    public boolean postEdit(PostEditDto postEditDto, String loginId, List<MultipartFile> images) {
         try {
-            Member memberCheck = memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
+            Member memberCheck = memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
 
             Post post = postRepository.findById(postEditDto.getPostId()).orElseThrow(IllegalArgumentException::new);
 
@@ -69,9 +70,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public boolean postDelete(Long postId, Member member) {
+    public boolean postDelete(Long postId, String loginId) {
         try {
-            Member memberCheck = memberRepository.findById(member.getMemberId())
+            Member memberCheck = memberRepository.findByLoginId(loginId)
                     .orElseThrow(() -> new IllegalArgumentException("회원이 일치하지 않습니다."));
 
             Post post = postRepository.findById(postId)
@@ -87,10 +88,6 @@ public class PostServiceImpl implements PostService {
             return false;
         }
     }
-    @Override
-    public List<Post> findPosts() {
-        return postRepository.findAll();
-    }
 
     @Override
     public Post findPost(Long postId) {
@@ -98,14 +95,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public boolean postMemberCheck(Post post, Member member) {
+    public boolean postMemberCheck(Post post, String loginId) {
 
-        memberRepository.findById(member.getMemberId()).orElseThrow(IllegalArgumentException::new);
+        memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
 
-        if(post.getMember().getMemberId().equals(member.getMemberId())){
-            return true;
-        }
-        return false;
+        return post.getMember().getLoginId().equals(loginId);
     }
 
     @Override

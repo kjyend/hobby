@@ -4,6 +4,7 @@ import com.hobbyproject.dto.member.request.SignupDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,19 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginServiceImpl implements LoginService{
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public Member login(String loginId, String password) {
-        return memberRepository.findByLoginId(loginId)
-                .filter(m -> m.getPassword().equals(password)).orElse(null);
-    }
 
     @Override
     @Transactional
     public void signup(SignupDto signupDto) {
         Member member = Member.builder()
                 .loginId(signupDto.getLoginId())
-                .password(signupDto.getPassword())
+                .password(passwordEncoder.encode(signupDto.getPassword()))
                 .name(signupDto.getName())
                 .birthday(signupDto.getBirthday())
                 .build();

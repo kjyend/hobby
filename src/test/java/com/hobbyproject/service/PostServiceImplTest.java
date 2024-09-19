@@ -52,7 +52,7 @@ class PostServiceImplTest {
                 .content("내용입니다.")
                 .build();
 
-        postService.postCreate(postWriteDto,member,null);
+        postService.postCreate(postWriteDto,member.getLoginId(),null);
 
         assertEquals(1L, postRepository.count());
 
@@ -89,7 +89,7 @@ class PostServiceImplTest {
                 .content("변경된 내용입니다.")
                 .build();
 
-        boolean result = postService.postEdit(postEditDto, member,null);
+        boolean result = postService.postEdit(postEditDto, member.getLoginId(),null);
 
         assertTrue(result);
     }
@@ -129,7 +129,7 @@ class PostServiceImplTest {
                 .content("변경된 내용입니다.")
                 .build();
 
-        boolean result = postService.postEdit(postEditDto, member2,null);
+        boolean result = postService.postEdit(postEditDto, member2.getLoginId(),null);
 
         assertFalse(result);
     }
@@ -153,7 +153,7 @@ class PostServiceImplTest {
                 .build();
 
 
-        boolean result = postService.postEdit(postEditDto, member,null);
+        boolean result = postService.postEdit(postEditDto, member.getLoginId(),null);
 
         assertFalse(result);
     }
@@ -178,7 +178,7 @@ class PostServiceImplTest {
 
         postRepository.save(post);
 
-        postService.postDelete(post.getPostId(), member);
+        postService.postDelete(post.getPostId(), member.getLoginId());
 
         assertEquals(0L, postRepository.count());
     }
@@ -212,7 +212,7 @@ class PostServiceImplTest {
 
         memberRepository.save(member2);
 
-        postService.postDelete(post.getPostId(), member2);
+        postService.postDelete(post.getPostId(), member2.getLoginId());
 
         assertEquals(1L, postRepository.count());
     }
@@ -230,7 +230,7 @@ class PostServiceImplTest {
         memberRepository.save(member);
 
 
-        boolean result = postService.postDelete(1L, member);
+        boolean result = postService.postDelete(1L, member.getLoginId());
 
         assertFalse(result);
     }
@@ -255,7 +255,7 @@ class PostServiceImplTest {
 
         postRepository.save(post);
 
-        boolean result = postService.postMemberCheck(post, member);
+        boolean result = postService.postMemberCheck(post, member.getLoginId());
 
         assertTrue(result);
     }
@@ -289,7 +289,7 @@ class PostServiceImplTest {
 
         memberRepository.save(member2);
 
-        boolean result = postService.postMemberCheck(post, member2);
+        boolean result = postService.postMemberCheck(post, member2.getLoginId());
 
         assertFalse(result);
     }
