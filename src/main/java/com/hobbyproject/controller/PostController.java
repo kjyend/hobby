@@ -2,6 +2,7 @@ package com.hobbyproject.controller;
 
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
+import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Post;
 import com.hobbyproject.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class PostController {
         model.addAttribute("totalPostCount", response.getTotalPostCount());
         model.addAttribute("currentPage", page);
 
-        boolean isLoggedIn = userDetails.getUsername() != null;
+        boolean isLoggedIn = userDetails != null;
         model.addAttribute("isLoggedIn", isLoggedIn);
 
 
@@ -42,10 +43,10 @@ public class PostController {
     public String postView(@PathVariable("postId") Long postId,@AuthenticationPrincipal UserDetails userDetails, Model model){
         Post post = postService.findPost(postId);
 
-        boolean isLoggedIn = userDetails.getUsername() != null;
+        boolean isLoggedIn = userDetails != null;
         model.addAttribute("isLoggedIn", isLoggedIn);
 
-        model.addAttribute("post", post);
+        model.addAttribute("post", new PostResponseDto(post));
         return "post/postview";
     }
 

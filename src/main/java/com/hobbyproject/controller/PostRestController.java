@@ -5,8 +5,11 @@ import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.service.PostService;
+import com.hobbyproject.service.UploadFileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +27,7 @@ import java.util.Map;
 public class PostRestController {
 
     private final PostService postService;
+    private final UploadFileService uploadFileService;
 
     @GetMapping("/posts")
     public PostPagingResponse getList(@RequestParam(name = "page",defaultValue = "1") int page,
@@ -38,6 +43,11 @@ public class PostRestController {
         }
 
         postService.postCreate(postWriteDto,userDetails.getUsername(),images);
+    }
+
+    @GetMapping("/images/{filename}")
+    public Resource downloadImage(@PathVariable("filename") String filename) throws MalformedURLException {
+        return new UrlResource("file:" + uploadFileService.getFullPath(filename));
     }
 
     @PostMapping("/post/edit/{postId}")

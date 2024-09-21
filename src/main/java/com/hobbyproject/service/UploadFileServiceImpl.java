@@ -22,6 +22,10 @@ public class UploadFileServiceImpl implements UploadFileService{
     @Value("${file.dir}")
     private String fileDir;
 
+    public String getFullPath(String filename) {
+        return fileDir + filename;
+    }
+
     @Override
     public void uploadFile(Post post, List<MultipartFile> images) {
         try {
@@ -42,10 +46,16 @@ public class UploadFileServiceImpl implements UploadFileService{
     }
 
     private String saveImage(MultipartFile image) throws IOException {
-        String uuid = UUID.randomUUID().toString()+"."+image.getOriginalFilename();
-        String dbPath=fileDir+uuid;
-        image.transferTo(new File(fileDir+image.getOriginalFilename()));
+        String ext =extractExt(image.getOriginalFilename());
+        String store = UUID.randomUUID().toString()+"."+ext;
+        String dbPath= getFullPath(store);
+        image.transferTo(new File(dbPath));
 
-        return dbPath;
+        return store;
+    }
+
+    private String extractExt(String originalFilename) {
+        int pos = originalFilename.lastIndexOf(".");
+        return originalFilename.substring(pos + 1);
     }
 }

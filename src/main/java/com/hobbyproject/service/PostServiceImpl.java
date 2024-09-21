@@ -40,7 +40,7 @@ public class PostServiceImpl implements PostService {
                 .build();
 
         postRepository.save(post);
-        if(images!=null) {
+        if(!images.getFirst().getOriginalFilename().equals("")) {
             uploadFileService.uploadFile(post, images);
         }
     }
