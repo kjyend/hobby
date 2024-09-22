@@ -13,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -34,6 +38,9 @@ class PostControllerTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @AfterEach
     void clean() {
@@ -81,15 +88,16 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("postview화면에서 클릭한 정보가 제대로 들어왔는가?")
+    @DisplayName("postview 화면에서 클릭한 정보가 제대로 들어왔는가?")
     void postCheck() throws Exception {
-        //given
+        // given
         Member member = Member.builder()
                 .loginId("1")
-                .password("1")
+                .password(passwordEncoder.encode("1"))  // 비밀번호는 암호화 필요
                 .name("이름")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
+
 
         Post post1 = Post.builder()
                 .title("제목1")
@@ -99,11 +107,14 @@ class PostControllerTest {
         memberRepository.save(member);
         Post post = postRepository.save(post1);
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("memberId",true);
+        UserDetails userDetails = User.withUsername("1")
+                .password(passwordEncoder.encode("1"))
+                .roles("USER")
+                .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/post/{postId}",post.getPostId()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(MockMvcRequestBuilders.get("/post/{postId}", post.getPostId())
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))) // 인증된 사용자 설정
+                .andExpect(MockMvcResultMatchers.status().isOk())  // 200 OK 상태 확인
                 .andExpect(MockMvcResultMatchers.model().attribute("post", Matchers.hasProperty("title", Matchers.is("제목1"))))
                 .andExpect(MockMvcResultMatchers.model().attribute("post", Matchers.hasProperty("content", Matchers.is("내용1"))))
                 .andDo(MockMvcResultHandlers.print());

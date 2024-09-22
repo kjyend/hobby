@@ -16,6 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -41,6 +44,9 @@ class PostRestControllerTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @AfterEach
     void clean() {
         postRepository.deleteAll();
@@ -50,6 +56,7 @@ class PostRestControllerTest {
     @Test
     @DisplayName("post 글쓰기 성공")
     void postWriteSuccessTest() throws Exception {
+        // given
         PostWriteDto postWrite = PostWriteDto.builder()
                 .title("제목입니다.")
                 .content("내용입니다.")
@@ -57,20 +64,23 @@ class PostRestControllerTest {
 
         Member member = Member.builder()
                 .loginId("asd123")
-                .password("qqq111")
+                .password(passwordEncoder.encode("qqq111"))  // 비밀번호는 암호화
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
 
         memberRepository.save(member);
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("memberId",member);
+        MockMultipartFile mockImage = new MockMultipartFile(
+                "images", "test.png", "image/png", "test image content".getBytes());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/write")
-                        .content(objectMapper.writeValueAsString(postWrite))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .session(session))
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/post/write")
+                        .file(mockImage)  // 이미지 파일 추가
+                        .param("title", postWrite.getTitle())
+                        .param("content", postWrite.getContent())
+                        .with(SecurityMockMvcRequestPostProcessors.user(member.getLoginId()))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
 
@@ -84,9 +94,10 @@ class PostRestControllerTest {
     @Test
     @DisplayName("post 글 수정 성공")
     void postEditSuccessTest() throws Exception {
+        // given
         Member member = Member.builder()
                 .loginId("asd123")
-                .password("qqq111")
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
@@ -107,13 +118,15 @@ class PostRestControllerTest {
                 .content("변경된 내용입니다.")
                 .build();
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("memberId",member);
+        MockMultipartFile mockImage = new MockMultipartFile(
+                "images", "test.png", "image/png", "test image content".getBytes());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/edit/{postId}",post.getPostId())
-                        .content(objectMapper.writeValueAsString(postEditDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .session(session))
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/post/edit/{postId}", post.getPostId())
+                        .file(mockImage)  // 이미지 파일 추가
+                        .param("title", postEditDto.getTitle())
+                        .param("content", postEditDto.getContent())
+                        .with(SecurityMockMvcRequestPostProcessors.user(member.getLoginId()))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
 
@@ -125,15 +138,14 @@ class PostRestControllerTest {
     }
 
     @Test
-    @DisplayName("다른 사람이 post 수정 시도 post 글 수정 실패")
+    @DisplayName("다른 사람이 post 수정 시도 시 post 글 수정 실패")
     void postOtherMemberEditFailTest() throws Exception {
         Member member = Member.builder()
                 .loginId("asd123")
-                .password("qqq111")
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
-
         memberRepository.save(member);
 
         Post post = Post.builder()
@@ -141,16 +153,14 @@ class PostRestControllerTest {
                 .content("내용입니다.")
                 .member(member)
                 .build();
-
         postRepository.save(post);
 
         Member member2 = Member.builder()
                 .loginId("aaa111")
-                .password("bbb222")
+                .password(passwordEncoder.encode("bbb222"))
                 .name("김원해")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
-
         memberRepository.save(member2);
 
         PostEditDto postEditDto = PostEditDto.builder()
@@ -159,13 +169,11 @@ class PostRestControllerTest {
                 .content("변경된 내용입니다.")
                 .build();
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("memberId",member2);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/edit/{postId}",post.getPostId())
-                        .content(objectMapper.writeValueAsString(postEditDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .session(session))
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/post/edit/{postId}", post.getPostId())
+                        .param("title", postEditDto.getTitle())
+                        .param("content", postEditDto.getContent())
+                        .with(SecurityMockMvcRequestPostProcessors.user(member2.getLoginId()))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andDo(MockMvcResultHandlers.print());
 
@@ -181,11 +189,10 @@ class PostRestControllerTest {
     void postEditFailTest() throws Exception {
         Member member = Member.builder()
                 .loginId("asd123")
-                .password("qqq111")
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
-
         memberRepository.save(member);
 
         PostEditDto postEditDto = PostEditDto.builder()
@@ -194,13 +201,12 @@ class PostRestControllerTest {
                 .content("변경된 내용입니다.")
                 .build();
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("memberId",member);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/edit/{postId}",1L)
-                        .content(objectMapper.writeValueAsString(postEditDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .session(session))
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/post/edit/{postId}", postEditDto.getPostId())
+                        .param("title", postEditDto.getTitle())
+                        .param("content", postEditDto.getContent())
+                        .with(SecurityMockMvcRequestPostProcessors.user(member.getLoginId()))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andDo(MockMvcResultHandlers.print());
 
@@ -212,7 +218,7 @@ class PostRestControllerTest {
     void postDeleteSuccessTest() throws Exception {
         Member member = Member.builder()
                 .loginId("asd123")
-                .password("qqq111")
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
@@ -233,7 +239,8 @@ class PostRestControllerTest {
         session.setAttribute("memberId",member);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/post/{postId}",post.getPostId())
-                        .session(session))
+                        .with(SecurityMockMvcRequestPostProcessors.user(member.getLoginId()))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
 
@@ -245,7 +252,7 @@ class PostRestControllerTest {
     void postOtherMemberDeleteFailTest() throws Exception {
         Member member = Member.builder()
                 .loginId("asd123")
-                .password("qqq111")
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
@@ -262,7 +269,7 @@ class PostRestControllerTest {
 
         Member member2 = Member.builder()
                 .loginId("aaa111")
-                .password("bbb222")
+                .password(passwordEncoder.encode("bbb222"))
                 .name("김원해")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
@@ -271,11 +278,9 @@ class PostRestControllerTest {
 
         assertEquals(1L, postRepository.count());
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("memberId", member2);
-
         mockMvc.perform(MockMvcRequestBuilders.delete("/post/{postId}", post.getPostId())
-                        .session(session))
+                        .with(SecurityMockMvcRequestPostProcessors.user(member2.getLoginId()))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("Post 삭제에 실패했습니다."))
                 .andDo(MockMvcResultHandlers.print());
@@ -286,18 +291,17 @@ class PostRestControllerTest {
     void noPostDeleteFailTest() throws Exception {
         Member member = Member.builder()
                 .loginId("asd123")
-                .password("qqq111")
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
 
         memberRepository.save(member);
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("memberId", member);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/post/{postId}", 1L)
-                        .session(session))
+                        .with(SecurityMockMvcRequestPostProcessors.user(member.getLoginId()))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("Post 삭제에 실패했습니다."))
                 .andDo(MockMvcResultHandlers.print());

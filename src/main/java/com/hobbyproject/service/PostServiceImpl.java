@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -40,7 +41,7 @@ public class PostServiceImpl implements PostService {
                 .build();
 
         postRepository.save(post);
-        if(!images.getFirst().getOriginalFilename().equals("")) {
+        if (images != null && !images.isEmpty() && !Objects.equals(images.get(0).getOriginalFilename(), "")) {
             uploadFileService.uploadFile(post, images);
         }
     }
@@ -61,7 +62,9 @@ public class PostServiceImpl implements PostService {
 
             postRepository.save(post);
 
-            uploadFileService.uploadFile(post,images);
+            if (images != null && !images.isEmpty() && !Objects.equals(images.get(0).getOriginalFilename(), "")) {
+                uploadFileService.uploadFile(post, images);
+            }
             return true;
         } catch (IllegalArgumentException e) {
             return false;
