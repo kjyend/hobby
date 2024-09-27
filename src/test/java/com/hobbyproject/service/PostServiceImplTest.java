@@ -1,7 +1,10 @@
 package com.hobbyproject.service;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
+import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostPagingResponse;
+import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 import com.hobbyproject.repository.MemberRepository;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -292,5 +296,39 @@ class PostServiceImplTest {
         boolean result = postService.postMemberCheck(post, member2.getLoginId());
 
         assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("N+1 문제 발생 여부 확인")
+    void checkNPlusOneProblem() {
+        Member member = Member.builder()
+                .loginId("asd123")
+                .password("qqq111")
+                .name("김회원")
+                .birthday(LocalDate.parse("2000-11-11"))
+                .build();
+
+        memberRepository.save(member);
+        System.out.println("member = " + member);
+
+        for (int i = 0; i < 10; i++) {
+            Post post = Post.builder()
+                    .title("Title " + i)
+                    .content("Content " + i)
+                    .member(member)
+                    .build();
+            postRepository.save(post);
+            System.out.println("post"+i+"= " + post+"("+i+")");
+        }
+
+        PostSearchDto postSearchDto = new PostSearchDto(0, 10);
+        PostPagingResponse response = postService.getList(postSearchDto);
+        System.out.println("response = " + response);
+
+        List<PostResponseDto> posts = response.getPosts();
+
+        for (PostResponseDto post : posts) {
+            System.out.println("post.getTitle() ="+post.getTitle());
+        }
     }
 }

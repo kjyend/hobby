@@ -65,12 +65,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     public List<CommentResponseDto> getList(Long postId) {
-        List<CommentResponseDto> comment = commentRepository.getComment(postId);
-
-        for (CommentResponseDto commentResponseDto : comment) {
-            System.out.println("commentResponseDto.getContent() = " + commentResponseDto.getContent());
-        }
-        return comment;
+        return commentRepository.getComment(postId);
     }
 
     @Override

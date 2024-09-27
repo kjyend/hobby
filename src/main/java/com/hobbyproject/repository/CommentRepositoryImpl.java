@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.hobbyproject.entity.QComment.comment;
+
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom{
 
@@ -17,9 +19,11 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
     @Override
     public List<CommentResponseDto> getComment(Long postId) {
         List<Comment> comments = jpaQueryFactory
-                .selectFrom(QComment.comment)
-                .leftJoin(QComment.comment.parent).fetchJoin()  // 자식 댓글을 함께 가져옴
-                .where(QComment.comment.post.postId.eq(postId))  // 최상위 댓글만 가져옴
+                .selectFrom(comment)
+                .leftJoin(comment.parent)
+                .fetchJoin()
+                .where(comment.post.postId.eq(postId))
+                .distinct()
                 .fetch();
 
         return comments.stream()
@@ -27,8 +31,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                         .id(c.getCommentId())
                         .content(c.getContent())
                         .isDeleted(c.getIsDeleted())
-                        .parent(c.getParent())  // 부모 댓글 정보 전달
-                        .name(c.getMember().getName())  // 작성자 이름
+                        .parent(c.getParent())
+                        .name(c.getMember().getName())
                         .build())
                 .collect(Collectors.toList());
     }
