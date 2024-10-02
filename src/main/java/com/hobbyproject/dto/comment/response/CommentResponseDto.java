@@ -13,17 +13,19 @@ public class CommentResponseDto {
     private DeleteStatus isDeleted;
     private Long parentId;
     private String name;
+    private String loginId;
 
 
     public CommentResponseDto() {
     }
 
     @Builder
-    public CommentResponseDto(Long id, String content, DeleteStatus isDeleted, Comment parent, String name) {
+    public CommentResponseDto(Long id, String content, DeleteStatus isDeleted, Comment parent, String name,String loginId) {
         this.id = id;
         this.content = content;
         this.isDeleted = isDeleted;
         this.parentId = (parent != null) ? parent.getCommentId() : null;
         this.name = name;
+        this.loginId=loginId;
     }
 }

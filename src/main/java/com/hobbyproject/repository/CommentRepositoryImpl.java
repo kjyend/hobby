@@ -2,7 +2,6 @@ package com.hobbyproject.repository;
 
 import com.hobbyproject.dto.comment.response.CommentResponseDto;
 import com.hobbyproject.entity.Comment;
-import com.hobbyproject.entity.QComment;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +32,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                         .isDeleted(c.getIsDeleted())
                         .parent(c.getParent())
                         .name(c.getMember().getName())
+                        .loginId(c.getMember().getLoginId())
                         .build())
                 .collect(Collectors.toList());
     }

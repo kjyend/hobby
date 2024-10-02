@@ -98,11 +98,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public boolean postMemberCheck(Post post, String loginId) {
+    public boolean postMemberCheck(Long postId, String loginId) {
 
-        memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
 
-        return post.getMember().getLoginId().equals(loginId);
+        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+
+        return post.getMember().getLoginId().equals(member.getLoginId());
     }
 
     @Override

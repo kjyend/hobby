@@ -21,7 +21,7 @@ public interface PostService {
 
     Post findPost(Long postId);
 
-    boolean postMemberCheck(Post post, String loginId);
+    boolean postMemberCheck(Long postId, String loginId);
 
     PostPagingResponse getList(PostSearchDto postSearch);
 }

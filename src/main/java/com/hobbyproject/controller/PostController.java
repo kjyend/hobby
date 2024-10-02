@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,7 +42,7 @@ public class PostController {
     public String postView(@PathVariable("postId") Long postId,@AuthenticationPrincipal UserDetails userDetails, Model model){
         Post post = postService.findPost(postId);
 
-        boolean isLoggedIn = userDetails != null;
+        boolean isLoggedIn = postService.postMemberCheck(postId,userDetails.getUsername());
         model.addAttribute("isLoggedIn", isLoggedIn);
 
         model.addAttribute("post", new PostResponseDto(post));
