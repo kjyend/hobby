@@ -259,7 +259,7 @@ class PostServiceImplTest {
 
         postRepository.save(post);
 
-        boolean result = postService.postMemberCheck(post, member.getLoginId());
+        boolean result = postService.postMemberCheck(post.getPostId(), member.getLoginId());
 
         assertTrue(result);
     }
@@ -293,7 +293,7 @@ class PostServiceImplTest {
 
         memberRepository.save(member2);
 
-        boolean result = postService.postMemberCheck(post, member2.getLoginId());
+        boolean result = postService.postMemberCheck(post.getPostId(), member2.getLoginId());
 
         assertFalse(result);
     }

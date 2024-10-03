@@ -109,7 +109,6 @@ class CommentServiceImplTest {
     @Test
     @DisplayName("댓글 목록 조회 성공")
     void getListSuccessTest() {
-        // given
         Member member = Member.builder()
                 .loginId("user123")
                 .password(passwordEncoder.encode("password"))
@@ -141,7 +140,6 @@ class CommentServiceImplTest {
 
         List<CommentResponseDto> commentList = commentService.getList(post.getPostId());
 
-        // then: 댓글 목록이 제대로 조회되었는지 확인
         assertEquals(2, commentList.size());
         assertEquals("댓글1", commentList.get(0).getContent());
         assertEquals("댓글2", commentList.get(1).getContent());
@@ -180,7 +178,6 @@ class CommentServiceImplTest {
     @Test
     @DisplayName("존재하지 않는 게시글에 댓글 생성 시도 실패")
     void createCommentOnNonexistentPostTest() {
-        // given
         Member member = Member.builder()
                 .loginId("user123")
                 .password(passwordEncoder.encode("password"))
@@ -193,7 +190,6 @@ class CommentServiceImplTest {
                 .content("댓글 내용")
                 .build();
 
-        // when & then
         assertThrows(IllegalArgumentException.class, () -> {
             commentService.commentCreate(createdComment, 9999L, member.getLoginId()); // 존재하지 않는 게시글 ID
         }, "게시글이 존재하지 않습니다.");
@@ -202,7 +198,6 @@ class CommentServiceImplTest {
     @Test
     @DisplayName("존재하지 않는 사용자로 댓글 생성 시도 실패")
     void createCommentWithNonexistentUserTest() {
-        // given: 게시글 생성
         Post post = Post.builder()
                 .title("테스트 게시글")
                 .content("게시글 내용")
@@ -213,9 +208,8 @@ class CommentServiceImplTest {
                 .content("댓글 내용")
                 .build();
 
-        // when & then
         assertThrows(IllegalArgumentException.class, () -> {
-            commentService.commentCreate(createdComment, post.getPostId(), "unknownUser"); // 존재하지 않는 사용자
+            commentService.commentCreate(createdComment, post.getPostId(), "unknownUser");
         }, "멤버가 존재하지 않습니다.");
     }
 
@@ -240,7 +234,7 @@ class CommentServiceImplTest {
 
         CreatedComment createdComment = CreatedComment.builder()
                 .content("답글 내용")
-                .parentId(9999L)  // 존재하지 않는 부모 댓글 ID
+                .parentId(9999L)
                 .build();
 
         // when & then
@@ -254,14 +248,13 @@ class CommentServiceImplTest {
     void deleteNonexistentCommentTest() {
         // when & then
         assertThrows(IllegalArgumentException.class, () -> {
-            commentService.deleteComment(9999L);  // 존재하지 않는 댓글 ID
+            commentService.deleteComment(9999L);
         }, "댓글이 존재하지 않습니다.");
     }
 
     @Test
     @DisplayName("자식 댓글이 있는 경우 부모 댓글 삭제 처리 성공")
     void deleteParentCommentWithChildrenSuccessTest() {
-        // given: 부모 댓글과 자식 댓글 생성
         Member member = Member.builder()
                 .loginId("user123")
                 .password(passwordEncoder.encode("password"))
@@ -292,10 +285,10 @@ class CommentServiceImplTest {
                 .build();
         commentRepository.save(childComment);
 
-        // when: 부모 댓글 삭제 시도
+
         commentService.deleteComment(parentComment.getCommentId());
 
-        // then: 부모 댓글이 삭제되지 않고 상태만 변경되었는지 확인
+
         Comment deletedParent = commentRepository.findById(parentComment.getCommentId()).orElseThrow();
         assertEquals(DeleteStatus.YES, deletedParent.getIsDeleted());
     }

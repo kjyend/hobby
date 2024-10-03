@@ -93,7 +93,7 @@ class PostControllerTest {
         // given
         Member member = Member.builder()
                 .loginId("1")
-                .password(passwordEncoder.encode("1"))  // 비밀번호는 암호화 필요
+                .password(passwordEncoder.encode("1"))
                 .name("이름")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
@@ -113,8 +113,8 @@ class PostControllerTest {
                 .build();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/post/{postId}", post.getPostId())
-                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))) // 인증된 사용자 설정
-                .andExpect(MockMvcResultMatchers.status().isOk())  // 200 OK 상태 확인
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.model().attribute("post", Matchers.hasProperty("title", Matchers.is("제목1"))))
                 .andExpect(MockMvcResultMatchers.model().attribute("post", Matchers.hasProperty("content", Matchers.is("내용1"))))
                 .andDo(MockMvcResultHandlers.print());

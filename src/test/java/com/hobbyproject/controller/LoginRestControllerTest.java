@@ -128,7 +128,7 @@ class LoginRestControllerTest {
         // 회원 생성 및 비밀번호 암호화
         Member member = Member.builder()
                 .loginId("asd123")
-                .password(passwordEncoder.encode("qqq111")) // 암호화된 비밀번호 저장
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
@@ -137,11 +137,11 @@ class LoginRestControllerTest {
 
         // 로그인 요청 - form 데이터로 전송
         mockMvc.perform(MockMvcRequestBuilders.post("/login")
-                        .param("username", "asd123")  // username 필드로 전송
-                        .param("password", "qqq111")  // password 필드로 전송
-                        .with(SecurityMockMvcRequestPostProcessors.csrf()))  // CSRF 토큰 추가
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) // 로그인 성공 시 리다이렉트
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/")) // 성공 후 리다이렉트 URL 확인
+                        .param("username", "asd123")
+                        .param("password", "qqq111")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
@@ -158,8 +158,8 @@ class LoginRestControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/login")
                         .content(objectMapper.writeValueAsString(login))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) // 실패 시 리다이렉트
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?error=true")) // 실패 후 리다이렉트 URL 확인
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?error=true"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
@@ -185,8 +185,8 @@ class LoginRestControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/login")
                         .content(objectMapper.writeValueAsString(login))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) // 실패 시 리다이렉트
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?error=true")) // 실패 후 리다이렉트 URL 확인
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?error=true"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
@@ -196,38 +196,35 @@ class LoginRestControllerTest {
         // 회원 생성 및 비밀번호 암호화
         Member member = Member.builder()
                 .loginId("asd123")
-                .password(passwordEncoder.encode("qqq111")) // 암호화된 비밀번호
+                .password(passwordEncoder.encode("qqq111"))
                 .name("김회원")
                 .birthday(LocalDate.parse("2000-11-11"))
                 .build();
 
-        memberRepository.save(member); // 회원 저장
+        memberRepository.save(member);
 
-        // 잘못된 로그인 ID로 로그인 시도
         mockMvc.perform(MockMvcRequestBuilders.post("/login")
-                        .param("username", "a123")  // 잘못된 아이디
-                        .param("password", "qqq111")  // 비밀번호는 동일
-                        .with(SecurityMockMvcRequestPostProcessors.csrf()))  // CSRF 토큰 추가
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) // 실패 시 리다이렉트
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?error=true")) // 실패 후 리다이렉트 URL 확인
+                        .param("username", "a123")
+                        .param("password", "qqq111")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?error=true"))
                 .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
     @DisplayName("로그아웃 성공")
     void logoutSuccessTest() throws Exception {
-        // 가짜 사용자(UserDetails) 생성
         UserDetails userDetails = User.withUsername("asd123")
-                .password("password")  // 실제 암호화된 비밀번호가 필요 없음
+                .password("password")
                 .roles("USER")
                 .build();
 
-        // 사용자를 인증한 상태로 로그아웃 요청
         mockMvc.perform(MockMvcRequestBuilders.post("/logout")
-                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))  // 인증된 사용자 설정
-                        .with(SecurityMockMvcRequestPostProcessors.csrf()))  // CSRF 토큰 추가
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())  // 리다이렉트 상태 확인
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?logout=true"))  // 로그아웃 후 리다이렉트 URL 확인
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/login?logout=true"))
                 .andDo(MockMvcResultHandlers.print());
     }
 }
