@@ -20,13 +20,21 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
+    public final QBaseEntity _super = new QBaseEntity(this);
+
     public final DatePath<java.time.LocalDate> birthday = createDate("birthday", java.time.LocalDate.class);
 
     public final ListPath<Comment, QComment> comments = this.<Comment, QComment>createList("comments", Comment.class, QComment.class, PathInits.DIRECT2);
 
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdDateTime = _super.createdDateTime;
+
     public final StringPath loginId = createString("loginId");
 
     public final NumberPath<Long> memberId = createNumber("memberId", Long.class);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> modifiedDateTime = _super.modifiedDateTime;
 
     public final StringPath name = createString("name");
 

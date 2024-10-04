@@ -22,13 +22,21 @@ public class QComment extends EntityPathBase<Comment> {
 
     public static final QComment comment = new QComment("comment");
 
+    public final QBaseEntity _super = new QBaseEntity(this);
+
     public final NumberPath<Long> commentId = createNumber("commentId", Long.class);
 
     public final StringPath content = createString("content");
 
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdDateTime = _super.createdDateTime;
+
     public final EnumPath<DeleteStatus> isDeleted = createEnum("isDeleted", DeleteStatus.class);
 
     public final QMember member;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> modifiedDateTime = _super.modifiedDateTime;
 
     public final QComment parent;
 
