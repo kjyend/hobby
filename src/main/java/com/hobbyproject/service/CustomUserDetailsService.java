@@ -2,7 +2,7 @@ package com.hobbyproject.service;
 
 import com.hobbyproject.entity.CustomUserDetails;
 import com.hobbyproject.entity.Member;
-import com.hobbyproject.repository.MemberRepository;
+import com.hobbyproject.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
