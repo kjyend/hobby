@@ -27,14 +27,14 @@ public class QMember extends EntityPathBase<Member> {
     public final ListPath<Comment, QComment> comments = this.<Comment, QComment>createList("comments", Comment.class, QComment.class, PathInits.DIRECT2);
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDateTime = _super.createdDateTime;
+    public final StringPath createdDate = _super.createdDate;
 
     public final StringPath loginId = createString("loginId");
 
     public final NumberPath<Long> memberId = createNumber("memberId", Long.class);
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDateTime = _super.modifiedDateTime;
+    public final StringPath modifiedDate = _super.modifiedDate;
 
     public final StringPath name = createString("name");
 

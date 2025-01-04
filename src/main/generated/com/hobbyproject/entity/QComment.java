@@ -29,14 +29,14 @@ public class QComment extends EntityPathBase<Comment> {
     public final StringPath content = createString("content");
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDateTime = _super.createdDateTime;
+    public final StringPath createdDate = _super.createdDate;
 
     public final EnumPath<DeleteStatus> isDeleted = createEnum("isDeleted", DeleteStatus.class);
 
     public final QMember member;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDateTime = _super.modifiedDateTime;
+    public final StringPath modifiedDate = _super.modifiedDate;
 
     public final QComment parent;
 
