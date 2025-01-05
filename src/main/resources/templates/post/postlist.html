@@ -28,7 +28,9 @@
             <tr th:each="post : ${posts}" th:action="@{/post/{postId}(postId=${post.id})}" class="get">
                 <td th:text="${post.id}"></td>
                 <td>
-                    <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}"></a>
+                    <a th:href="@{/post/{postId}(postId=${post.id})}"
+                        th:text="${#strings.length(post.title) > 10 ? post.title.substring(0, 10) + '...' : post.title}">
+                    </a>
                 </td>
                 <td th:text="${post.content}"></td>
                 <td>
