@@ -28,6 +28,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final StringPath content = createString("content");
 
+    public final NumberPath<Long> count = createNumber("count", Long.class);
+
     //inherited
     public final StringPath createdDate = _super.createdDate;
 

@@ -9,4 +9,6 @@ public interface PostRepositoryCustom {
     List<Post> getList(PostSearchDto postSearch);
 
     long count();
+
+    void updateViewCount(Long postId, Long updatedCount);
 }

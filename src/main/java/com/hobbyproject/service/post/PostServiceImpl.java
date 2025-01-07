@@ -11,6 +11,7 @@ import com.hobbyproject.repository.member.MemberRepository;
 import com.hobbyproject.repository.post.PostRepository;
 import com.hobbyproject.service.file.UploadFileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,5 +122,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public Long getViewCount(Long postId) {
         return postRepository.findCountByPostId(postId);
+    }
+
+    @CachePut(value = "viewCounts", key = "#postId")
+    @Transactional
+    @Override
+    public void incrementViewCount(Long postId) {
+        postRepository.updateViewCount(postId, getViewCount(postId)+1);
     }
 }

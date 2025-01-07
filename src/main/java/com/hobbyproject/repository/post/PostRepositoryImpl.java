@@ -26,4 +26,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     public long count() {
         return jpaQueryFactory.selectFrom(QPost.post).fetchCount();
     }
+
+    @Override
+    public void updateViewCount(Long postId, Long updatedCount) {
+        jpaQueryFactory.update(QPost.post)
+                .set(QPost.post.count,updatedCount)
+                .where(QPost.post.postId.eq(postId))
+                .execute();
+    }
 }

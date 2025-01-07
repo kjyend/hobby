@@ -26,4 +26,6 @@ public interface PostService {
     PostPagingResponse getList(PostSearchDto postSearch);
 
     Long getViewCount(Long postId);
+
+    void incrementViewCount(Long postId);
 }
