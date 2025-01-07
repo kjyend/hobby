@@ -24,4 +24,6 @@ public interface PostService {
     boolean postMemberCheck(Long postId, String loginId);
 
     PostPagingResponse getList(PostSearchDto postSearch);
+
+    Long getViewCount(Long postId);
 }

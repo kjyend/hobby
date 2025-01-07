@@ -10,8 +10,8 @@ import com.hobbyproject.entity.Post;
 import com.hobbyproject.repository.member.MemberRepository;
 import com.hobbyproject.repository.post.PostRepository;
 import com.hobbyproject.service.file.UploadFileService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -115,5 +115,11 @@ public class PostServiceImpl implements PostService {
         long totalPostCount = postRepository.count();
 
         return new PostPagingResponse(posts.stream().map(PostResponseDto::new).collect(Collectors.toList()), totalPostCount);
+    }
+
+    @Cacheable(value = "viewCounts", key = "#postId")
+    @Override
+    public Long getViewCount(Long postId) {
+        return postRepository.findCountByPostId(postId);
     }
 }
