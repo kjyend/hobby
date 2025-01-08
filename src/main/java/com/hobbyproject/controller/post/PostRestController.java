@@ -70,4 +70,8 @@ public class PostRestController {
         }
     }
 
+    @PostMapping("/post/{postId}/count")
+    public void postViewCount(@PathVariable("postId") Long postId){
+        postService.incrementViewCount(postId);
+    }
 }
