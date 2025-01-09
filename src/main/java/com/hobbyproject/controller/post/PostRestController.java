@@ -6,6 +6,9 @@ import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.service.post.PostService;
 import com.hobbyproject.service.file.UploadFileService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -71,7 +74,36 @@ public class PostRestController {
     }
 
     @PostMapping("/post/{postId}/count")
-    public void postViewCount(@PathVariable("postId") Long postId){
-        postService.incrementViewCount(postId);
+    public void postViewCount(@PathVariable("postId") Long postId, HttpServletRequest req, HttpServletResponse res){
+        viewCountUp(postId, req, res);
+    }
+
+    private void viewCountUp(Long id, HttpServletRequest req, HttpServletResponse res) {
+        Cookie oldCookie = null;
+
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("count")) {
+                    oldCookie = cookie;
+                }
+            }
+        }
+
+        if (oldCookie != null) {
+            if (!oldCookie.getValue().contains("[" + id.toString() + "]")) {
+                postService.incrementViewCount(id);
+                oldCookie.setValue(oldCookie.getValue() + "_[" + id + "]");
+                oldCookie.setPath("/");
+                oldCookie.setMaxAge(60 * 60 * 24);
+                res.addCookie(oldCookie);
+            }
+        } else {
+            postService.incrementViewCount(id);
+            Cookie newCookie = new Cookie("count","[" + id + "]");
+            newCookie.setPath("/");
+            newCookie.setMaxAge(60 * 60 * 24);
+            res.addCookie(newCookie);
+        }
     }
 }
