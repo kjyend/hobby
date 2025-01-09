@@ -118,13 +118,11 @@ public class PostServiceImpl implements PostService {
         return new PostPagingResponse(posts.stream().map(PostResponseDto::new).collect(Collectors.toList()), totalPostCount);
     }
 
-    @Cacheable(value = "viewCounts", key = "#postId")
     @Override
     public Long getViewCount(Long postId) {
         return postRepository.findCountByPostId(postId);
     }
 
-    @CachePut(value = "viewCounts", key = "#postId")
     @Transactional
     @Override
     public void incrementViewCount(Long postId) {
