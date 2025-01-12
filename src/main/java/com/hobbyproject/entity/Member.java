@@ -29,6 +29,9 @@ public class Member extends BaseEntity{
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<PostLike> postLikes=new ArrayList<>();
+
     @Builder
     public Member(Long memberId, String loginId, String password, String name, LocalDate birthday) {
         this.memberId = memberId;

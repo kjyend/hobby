@@ -35,6 +35,9 @@ public class Post extends BaseEntity{
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Comment> comments=new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<PostLike> postLikes=new ArrayList<>();
+
     @Builder
     public Post(Long postId, String title, String content, Member member) {
         this.postId = postId;
