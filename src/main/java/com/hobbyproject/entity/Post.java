@@ -51,4 +51,7 @@ public class Post extends BaseEntity{
         title=postEditDto.getTitle();
         content=postEditDto.getContent();
     }
+    public void updateLikeCount(Long count){
+        this.count=count;
+    }
 }
