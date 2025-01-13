@@ -2,6 +2,7 @@ package com.hobbyproject.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,10 @@ public class PostLike extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Builder
+    public PostLike(Post post, Member member) {
+        this.post = post;
+        this.member = member;
+    }
 }
