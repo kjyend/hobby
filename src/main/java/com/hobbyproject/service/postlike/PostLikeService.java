@@ -4,7 +4,11 @@ import com.hobbyproject.entity.Post;
 
 public interface PostLikeService {
 
-    public Post addPostLikeAndIncrementCount(Long boardId, String memberName);
+    Post addPostLikeAndIncrementCount(Long boardId, String memberName);
 
-    public Post cancelPostLikeAndDecrementCount(Long boardId, String memberName);
+    Post cancelPostLikeAndDecrementCount(Long boardId, String memberName);
+
+    boolean isUserLikedPost(Long postId, String memberName);
+
+    Long getLikeCount(Long postId);
 }

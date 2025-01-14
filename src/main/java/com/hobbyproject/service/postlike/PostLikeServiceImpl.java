@@ -47,12 +47,27 @@ public class PostLikeServiceImpl implements PostLikeService {
         PostLike postLike = postLikeRepository.findByMemberAndPost(member, post);
 
         if(postLike != null) {
-            postLikeRepository.delete(PostLike.builder().member(member).post(post).build());
+            postLikeRepository.delete(postLike);
             updateLikeCount(post);
         }else{
             throw new IllegalArgumentException("좋아요를 누르지 않았습니다.");
         }
         return postRepository.save(post);
+    }
+
+    @Override
+    public boolean isUserLikedPost(Long postId, String memberName) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        Member member = memberRepository.findByLoginId(memberName)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return postLikeRepository.existsByPostAndMember(post,member);
+    }
+
+    @Override
+    public Long getLikeCount(Long postId) {
+        return postRepository.findLikeCountByPostId(postId);
     }
 
 }
