@@ -22,6 +22,7 @@ public class Post extends BaseEntity{
     private String title;
     private String content;
     private Long count;
+    private Long likeCount;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -45,6 +46,7 @@ public class Post extends BaseEntity{
         this.content = content;
         this.member = member;
         this.count=0L;
+        this.likeCount=0L;
     }
 
     public void edit(PostEditDto postEditDto) {
@@ -52,6 +54,6 @@ public class Post extends BaseEntity{
         content=postEditDto.getContent();
     }
     public void updateLikeCount(Long count){
-        this.count=count;
+        this.likeCount=count;
     }
 }

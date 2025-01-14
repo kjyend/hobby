@@ -33,6 +33,8 @@ public class QPost extends EntityPathBase<Post> {
     //inherited
     public final StringPath createdDate = _super.createdDate;
 
+    public final NumberPath<Long> likeCount = createNumber("likeCount", Long.class);
+
     public final QMember member;
 
     //inherited

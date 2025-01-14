@@ -15,6 +15,7 @@ public class PostResponseDto {
     private String title;
     private String content;
     private Long count;
+    private Long likeCount;
     private List<String> imageUrls;
     private String createTime;
     private String modifyTime;
@@ -25,6 +26,7 @@ public class PostResponseDto {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.count = post.getCount();
+        this.likeCount = post.getLikeCount();
         this.imageUrls = post.getUploadFiles().stream()
                 .map(UploadFile::getStoreFileName)
                 .collect(Collectors.toList());
