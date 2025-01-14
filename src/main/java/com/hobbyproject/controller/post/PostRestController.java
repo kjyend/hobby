@@ -91,7 +91,7 @@ public class PostRestController {
         }
 
         if (oldCookie != null) {
-            if (!oldCookie.getValue().contains("[" + id.toString() + "]")) {
+            if (!oldCookie.getValue().contains("[ " + id.toString() + " ]")) {
                 postService.incrementViewCount(id);
                 oldCookie.setValue(oldCookie.getValue() + "_[" + id + "]");
                 oldCookie.setPath("/");
