@@ -24,6 +24,13 @@
         <button th:if="${isLoggedIn}" class="btn btn-danger" th:onclick="'deletePost('+${post.id}+')'">삭제하기</button>
     </div>
 
+    <div class="like-container mt-4">
+        <button id="like-button" class="btn btn-outline-primary"
+                th:onclick="'toggleLike('+${post.id}+');'">
+            좋아요 (<span th:text="${post.likeCount}">0</span>)
+        </button>
+    </div>
+
     <div id="comment-list" class="mt-5">
         <h3>댓글</h3>
     </div>
@@ -46,6 +53,9 @@
 </script>
 
 <script>
+    let liked = false;
+    let isProcessing = false;
+
     function loadComments(postId) {
         fetch(`/post/${postId}/comment`)
             .then(response => response.json())
@@ -64,7 +74,6 @@
                             <p>${comment.name}: ${comment.content}</p>
                         `;
 
-                        // 댓글 작성자와 현재 로그인한 사용자가 일치할 경우에만 삭제 버튼 표시
                         if (comment.loginId === currentUserLoginId) {
                             commentElement.innerHTML += `
                                 <button class="btn btn-danger btn-sm" onclick="deleteComment(${postId}, ${comment.id})">댓글 삭제</button>
@@ -148,7 +157,57 @@
     document.addEventListener('DOMContentLoaded', function () {
         const postId = [[${post.id}]];
         loadComments(postId);
+        fetch(`/post/${postId}/like/status`)
+            .then(response => response.json())
+            .then(data => {
+                liked = data.liked;
+                updateLikeUI(postId);
+            });
     });
+
+    function toggleLike(postId) {
+        if (isProcessing) return;
+        isProcessing = true;
+
+        const url = liked ? `/post/${postId}/like/cancel` : `/post/${postId}/like`;
+        const method = 'POST';
+
+        fetch(url, { method })
+            .then(response => {
+                if (response.ok) {
+                    liked = !liked;
+                    updateLikeUI(postId);
+                } else {
+                    alert('좋아요 상태 변경 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => console.error('좋아요 상태 변경 중 오류:', error))
+            .finally(() => {
+                isProcessing = false;
+            });
+    }
+
+
+    function updateLikeUI(postId) {
+        const likeButton = document.getElementById('like-button');
+        const likeCountElement = document.getElementById('like-count');
+
+        fetch(`/post/${postId}/like/count`)
+            .then(response => response.json())
+            .then(data => {
+                likeCountElement.textContent = data.count;
+            });
+
+        if (liked) {
+            likeButton.classList.remove('btn-outline-primary');
+            likeButton.classList.add('btn-primary');
+            likeButton.textContent = `좋아요 (${likeCountElement.textContent})`;
+        } else {
+            likeButton.classList.remove('btn-primary');
+            likeButton.classList.add('btn-outline-primary');
+            likeButton.textContent = `좋아요 (${likeCountElement.textContent})`;
+        }
+    }
 </script>
 
 </body>
