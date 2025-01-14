@@ -47,7 +47,7 @@ public class PostLikeServiceImpl implements PostLikeService {
         PostLike postLike = postLikeRepository.findByMemberAndPost(member, post);
 
         if(postLike != null) {
-            postLikeRepository.save(PostLike.builder().member(member).post(post).build());
+            postLikeRepository.delete(PostLike.builder().member(member).post(post).build());
             updateLikeCount(post);
         }else{
             throw new IllegalArgumentException("좋아요를 누르지 않았습니다.");
