@@ -113,7 +113,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostPagingResponse getList(PostSearchDto postSearch) {
         List<Post> posts = postRepository.getList(postSearch);
-        long totalPostCount = postRepository.count();
+        long totalPostCount = postRepository.postCount();
 
         return new PostPagingResponse(posts.stream().map(PostResponseDto::new).collect(Collectors.toList()), totalPostCount);
     }

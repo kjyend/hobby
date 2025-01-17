@@ -23,8 +23,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     }
 
     @Override
-    public long count() {
-        return jpaQueryFactory.selectFrom(QPost.post).fetchCount();
+    public long postCount() {
+        return jpaQueryFactory.selectFrom(QPost.post).fetch().size();
     }
 
     @Override
