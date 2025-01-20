@@ -1,12 +1,12 @@
 package com.hobbyproject.repository.post;
 
 import com.hobbyproject.dto.post.request.PostSearchDto;
-import com.hobbyproject.entity.Post;
+import com.hobbyproject.dto.post.response.PostListDto;
 
 import java.util.List;
 
 public interface PostRepositoryCustom {
-    List<Post> getList(PostSearchDto postSearch);
+    List<PostListDto> getList(PostSearchDto postSearch);
 
     long postCount();
 

@@ -3,6 +3,7 @@ package com.hobbyproject.service.post;
 import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
@@ -11,15 +12,12 @@ import com.hobbyproject.repository.member.MemberRepository;
 import com.hobbyproject.repository.post.PostRepository;
 import com.hobbyproject.service.file.UploadFileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -96,8 +94,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post findPost(Long postId) {
-        return postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+    public PostResponseDto findPost(Long postId) {
+        return new PostResponseDto(postRepository.findById(postId).orElseThrow(IllegalArgumentException::new));
     }
 
     @Override
@@ -112,10 +110,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostPagingResponse getList(PostSearchDto postSearch) {
-        List<Post> posts = postRepository.getList(postSearch);
+        List<PostListDto> posts = postRepository.getList(postSearch);
         long totalPostCount = postRepository.postCount();
 
-        return new PostPagingResponse(posts.stream().map(PostResponseDto::new).collect(Collectors.toList()), totalPostCount);
+        return new PostPagingResponse(posts, totalPostCount);
     }
 
     @Override

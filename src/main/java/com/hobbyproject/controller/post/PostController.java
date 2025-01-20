@@ -3,7 +3,6 @@ package com.hobbyproject.controller.post;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.dto.post.response.PostResponseDto;
-import com.hobbyproject.entity.Post;
 import com.hobbyproject.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,12 +39,12 @@ public class PostController {
 
     @GetMapping("/post/{postId}")
     public String postView(@PathVariable("postId") Long postId,@AuthenticationPrincipal UserDetails userDetails, Model model){
-        Post post = postService.findPost(postId);
+        PostResponseDto post = postService.findPost(postId);
 
         boolean isLoggedIn = postService.postMemberCheck(postId,userDetails.getUsername());
         model.addAttribute("isLoggedIn", isLoggedIn);
 
-        model.addAttribute("post", new PostResponseDto(post));
+        model.addAttribute("post", post);
         return "post/postview";
     }
 

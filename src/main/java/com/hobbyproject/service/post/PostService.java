@@ -4,6 +4,7 @@ import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
+import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Post;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,7 @@ public interface PostService {
     boolean postDelete(Long postId, String loginId);
 
 
-    Post findPost(Long postId);
+    PostResponseDto findPost(Long postId);
 
     boolean postMemberCheck(Long postId, String loginId);
 

@@ -3,6 +3,7 @@ package com.hobbyproject.service.post;
 import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
@@ -326,9 +327,9 @@ class PostServiceImplTest {
         PostPagingResponse response = postService.getList(postSearchDto);
         System.out.println("response = " + response);
 
-        List<PostResponseDto> posts = response.getPosts();
+        List<PostListDto> posts = response.getPosts();
 
-        for (PostResponseDto post : posts) {
+        for (PostListDto post : posts) {
             System.out.println("post.getTitle() ="+post.getTitle());
         }
     }

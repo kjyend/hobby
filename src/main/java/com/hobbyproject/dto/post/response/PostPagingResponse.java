@@ -6,13 +6,13 @@ import java.util.List;
 @Getter
 public class PostPagingResponse {
 
-    private List<PostResponseDto> posts;
+    private List<PostListDto> posts;
     private long totalPostCount;
 
     public PostPagingResponse() {
     }
 
-    public PostPagingResponse(List<PostResponseDto> posts, long totalPostCount) {
+    public PostPagingResponse(List<PostListDto> posts, long totalPostCount) {
         this.posts = posts;
         this.totalPostCount = totalPostCount;
     }

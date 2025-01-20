@@ -3,8 +3,8 @@ package com.hobbyproject.controller.post;
 import com.hobbyproject.dto.post.request.PostEditDto;
 import com.hobbyproject.dto.post.request.PostSearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
+import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
-import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.service.post.PostServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -138,8 +138,8 @@ public class PostRestMockControllerTest {
         // given
         PostPagingResponse mockResponse = new PostPagingResponse(
                 List.of(
-                        new PostResponseDto(1L, "Mock 제목 1", "Mock 내용 1", List.of("image1.png")),
-                        new PostResponseDto(2L, "Mock 제목 2", "Mock 내용 2", List.of("image2.png"))
+                        new PostListDto(1L, "Mock 제목 1", "Mock 내용 1",1L,10L,"2000-01-01"),
+                        new PostListDto(2L, "Mock 제목 2", "Mock 내용 2",3L,10L,"2000-01-02")
                 ),
                 2L
         );
