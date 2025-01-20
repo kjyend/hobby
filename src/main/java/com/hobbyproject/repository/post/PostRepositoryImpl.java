@@ -1,8 +1,9 @@
 package com.hobbyproject.repository.post;
 
 import com.hobbyproject.dto.post.request.PostSearchDto;
-import com.hobbyproject.entity.Post;
+import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.entity.QPost;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -14,8 +15,17 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Post> getList(PostSearchDto postSearch) {
-        return jpaQueryFactory.selectFrom(QPost.post)
+    public List<PostListDto> getList(PostSearchDto postSearch) {
+        return jpaQueryFactory.select(
+                Projections.fields(PostListDto.class,
+                        QPost.post.postId,
+                        QPost.post.title,
+                        QPost.post.content,
+                        QPost.post.count,
+                        QPost.post.likeCount,
+                        QPost.post.createdDate
+                        ))
+                .from(QPost.post)
                 .limit(postSearch.getSize())
                 .offset(postSearch.getOffset())
                 .orderBy(QPost.post.postId.desc())
