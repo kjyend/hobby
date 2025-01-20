@@ -3,13 +3,13 @@ package com.hobbyproject.repository.post;
 
 import com.hobbyproject.config.QueryDslConfig;
 import com.hobbyproject.dto.post.request.PostSearchDto;
+import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.entity.Post;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 
 
 import java.util.ArrayList;
@@ -28,16 +28,26 @@ class PostRepositoryTest {
 
     @BeforeAll
     void setUp() {
+        int batchSize = 1000; // 한 번에 처리할 데이터 크기
         List<Post> posts = new ArrayList<>();
-        for (long i = 1L; i <= 1_000L; i++) {
+
+        for (long i = 1L; i <= 10_000L; i++) {
             Post post = Post.builder()
                     .postId(i)
-                    .content(Long.toString(i)+"내용입니다.")
-                    .title(Long.toString(i)+"제목입니다.")
+                    .content(i + "내용입니다.")
+                    .title(i + "제목입니다.")
                     .build();
             posts.add(post);
+
+            if (posts.size() == batchSize) {
+                postRepository.saveAll(posts);
+                posts.clear();
+            }
         }
-        postRepository.saveAll(posts);
+
+        if (!posts.isEmpty()) {
+            postRepository.saveAll(posts);
+        }
     }
 
     @AfterAll
@@ -81,10 +91,10 @@ class PostRepositoryTest {
     @Test
     @DisplayName("게시글 페이징 조회")
     void testGetList() {
-        PostSearchDto searchDto = new PostSearchDto(16, 10);
+        PostSearchDto searchDto = new PostSearchDto(9, 500);
 
-        List<Post> posts = postRepository.getList(searchDto);
+        List<PostListDto> posts = postRepository.getList(searchDto);
 
-        assertEquals(10, posts.size(), "Should return 10 posts");
+        assertEquals(500, posts.size(), "Should return 10 posts");
     }
 }
