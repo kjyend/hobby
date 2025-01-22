@@ -91,10 +91,14 @@ class PostRepositoryTest {
     @Test
     @DisplayName("게시글 페이징 조회")
     void testGetList() {
-        PostSearchDto searchDto = new PostSearchDto(9, 500);
+        PostSearchDto searchDto = new PostSearchDto(19, 500);
 
+        long startTime = System.currentTimeMillis();
         List<PostListDto> posts = postRepository.getList(searchDto);
+        long endTime = System.currentTimeMillis();
 
-        assertEquals(500, posts.size(), "Should return 10 posts");
+        assertEquals(500, posts.size());
+        System.out.println("조회 시간(ms): " + (endTime - startTime)+"ms");
+
     }
 }
