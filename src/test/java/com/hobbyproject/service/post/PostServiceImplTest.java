@@ -1,16 +1,14 @@
 package com.hobbyproject.service.post;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
-import com.hobbyproject.dto.post.request.PostSearchDto;
+import com.hobbyproject.dto.post.request.SearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
-import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 import com.hobbyproject.repository.member.MemberRepository;
 import com.hobbyproject.repository.post.PostRepository;
-import com.hobbyproject.service.post.PostService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -323,7 +321,7 @@ class PostServiceImplTest {
             System.out.println("post"+i+"= " + post+"("+i+")");
         }
 
-        PostSearchDto postSearchDto = new PostSearchDto(0, 10);
+        SearchDto postSearchDto = new SearchDto(0, 10);
         PostPagingResponse response = postService.getList(postSearchDto);
         System.out.println("response = " + response);
 

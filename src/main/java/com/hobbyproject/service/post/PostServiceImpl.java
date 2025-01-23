@@ -1,7 +1,7 @@
 package com.hobbyproject.service.post;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
-import com.hobbyproject.dto.post.request.PostSearchDto;
+import com.hobbyproject.dto.post.request.SearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
@@ -109,7 +109,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostPagingResponse getList(PostSearchDto postSearch) {
+    public PostPagingResponse getList(SearchDto postSearch) {
         List<PostListDto> posts = postRepository.getList(postSearch);
         long totalPostCount = postRepository.postCount();
 

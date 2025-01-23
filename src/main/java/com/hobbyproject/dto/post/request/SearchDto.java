@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostSearchDto {
+public class SearchDto {
 
     private int page = 1;
     private int size = 10;
 
     @Builder
-    public PostSearchDto(int page, int size) {
+    public SearchDto(int page, int size) {
         this.page = page;
         this.size = size;
     }

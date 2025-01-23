@@ -1,7 +1,7 @@
 package com.hobbyproject.controller.post;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
-import com.hobbyproject.dto.post.request.PostSearchDto;
+import com.hobbyproject.dto.post.request.SearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostListDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
@@ -138,13 +138,13 @@ public class PostRestMockControllerTest {
         // given
         PostPagingResponse mockResponse = new PostPagingResponse(
                 List.of(
-                        new PostListDto(1L, "Mock 제목 1", "Mock 내용 1",1L,10L,"2000-01-01"),
-                        new PostListDto(2L, "Mock 제목 2", "Mock 내용 2",3L,10L,"2000-01-02")
+                        new PostListDto(1L, "Mock 제목 1",1L,10L,"2000-01-01","mem"),
+                        new PostListDto(2L, "Mock 제목 2",3L,10L,"2000-01-02","me")
                 ),
                 2L
         );
 
-        given(postService.getList(any(PostSearchDto.class))).willReturn(mockResponse);
+        given(postService.getList(any(SearchDto.class))).willReturn(mockResponse);
 
         // when
         mockMvc.perform(MockMvcRequestBuilders.get("/posts")
@@ -160,6 +160,6 @@ public class PostRestMockControllerTest {
                 .andDo(MockMvcResultHandlers.print());
 
         // then
-        verify(postService, times(1)).getList(any(PostSearchDto.class));
+        verify(postService, times(1)).getList(any(SearchDto.class));
     }
 }

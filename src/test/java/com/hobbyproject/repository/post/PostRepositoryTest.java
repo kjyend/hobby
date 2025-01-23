@@ -2,9 +2,11 @@ package com.hobbyproject.repository.post;
 
 
 import com.hobbyproject.config.QueryDslConfig;
-import com.hobbyproject.dto.post.request.PostSearchDto;
+import com.hobbyproject.dto.post.request.SearchDto;
 import com.hobbyproject.dto.post.response.PostListDto;
+import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
+import com.hobbyproject.repository.member.MemberRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,17 +27,22 @@ class PostRepositoryTest {
 
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @BeforeAll
     void setUp() {
         int batchSize = 1000; // 한 번에 처리할 데이터 크기
         List<Post> posts = new ArrayList<>();
 
+        Member member = memberRepository.save(Member.builder().build());
+
         for (long i = 1L; i <= 10_000L; i++) {
             Post post = Post.builder()
                     .postId(i)
                     .content(i + "내용입니다.")
                     .title(i + "제목입니다.")
+                    .member(member)
                     .build();
             posts.add(post);
 
@@ -91,7 +98,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("게시글 페이징 조회")
     void testGetList() {
-        PostSearchDto searchDto = new PostSearchDto(19, 500);
+        SearchDto searchDto = new SearchDto(19, 500);
 
         long startTime = System.currentTimeMillis();
         List<PostListDto> posts = postRepository.getList(searchDto);

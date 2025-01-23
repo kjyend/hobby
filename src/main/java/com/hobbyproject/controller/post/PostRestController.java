@@ -1,7 +1,7 @@
 package com.hobbyproject.controller.post;
 
 import com.hobbyproject.dto.post.request.PostEditDto;
-import com.hobbyproject.dto.post.request.PostSearchDto;
+import com.hobbyproject.dto.post.request.SearchDto;
 import com.hobbyproject.dto.post.request.PostWriteDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.service.post.PostService;
@@ -33,7 +33,7 @@ public class PostRestController {
     @GetMapping("/posts")
     public PostPagingResponse getList(@RequestParam(name = "page",defaultValue = "1") int page,
                                       @RequestParam(name = "size",defaultValue = "10") int size) {
-        PostSearchDto postSearch = new PostSearchDto(page, size);
+        SearchDto postSearch = new SearchDto(page, size);
         return postService.getList(postSearch);
     }
 

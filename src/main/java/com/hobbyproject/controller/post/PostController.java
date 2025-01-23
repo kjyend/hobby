@@ -1,6 +1,6 @@
 package com.hobbyproject.controller.post;
 
-import com.hobbyproject.dto.post.request.PostSearchDto;
+import com.hobbyproject.dto.post.request.SearchDto;
 import com.hobbyproject.dto.post.response.PostPagingResponse;
 import com.hobbyproject.dto.post.response.PostResponseDto;
 import com.hobbyproject.service.post.PostService;
@@ -23,7 +23,7 @@ public class PostController {
 
     @GetMapping("/post")
     public String postList(@RequestParam(name = "page",defaultValue = "1") int page,@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        PostSearchDto postSearch = new PostSearchDto(page, 10);
+        SearchDto postSearch = new SearchDto(page, 10);
         PostPagingResponse response = postService.getList(postSearch);
 
         model.addAttribute("posts", response.getPosts());
