@@ -1,14 +1,14 @@
 package com.hobbyproject.repository.commnet;
 
 import com.hobbyproject.dto.comment.response.CommentResponseDto;
-import com.hobbyproject.entity.Comment;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.hobbyproject.entity.QComment.comment;
+import static com.hobbyproject.entity.QMember.member;
 
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom{
@@ -17,23 +17,17 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
 
     @Override
     public List<CommentResponseDto> getComment(Long postId) {
-        List<Comment> comments = jpaQueryFactory
-                .selectFrom(comment)
-                .leftJoin(comment.parent)
-                .fetchJoin()
+        return jpaQueryFactory.select(Projections.fields(CommentResponseDto.class,
+                        comment.commentId,
+                        comment.content,
+                        comment.isDeleted,
+                        comment.parent.commentId,
+                        member.name,
+                        member.loginId
+                ))
+                .from(comment)
+                .leftJoin(comment.member, member)
                 .where(comment.post.postId.eq(postId))
-                .distinct()
                 .fetch();
-
-        return comments.stream()
-                .map(c -> CommentResponseDto.builder()
-                        .id(c.getCommentId())
-                        .content(c.getContent())
-                        .isDeleted(c.getIsDeleted())
-                        .parent(c.getParent())
-                        .name(c.getMember().getName())
-                        .loginId(c.getMember().getLoginId())
-                        .build())
-                .collect(Collectors.toList());
     }
 }
