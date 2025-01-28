@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow" style="width: 400px;">
+        <h2 class="text-center">회원가입</h2>
+        <form id="signupForm">
+            <div class="form-group mt-3">
+                <label for="loginId">아이디</label>
+                <input type="text" id="loginId" name="loginId" class="form-control" placeholder="아이디를 입력하세요">
+            </div>
+            <div class="form-group mt-3">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력하세요">
+            </div>
+            <div class="form-group mt-3">
+                <label for="checkPassword">비밀번호 체크</label>
+                <input type="password" id="checkPassword" name="checkPassword" class="form-control" placeholder="비밀번호를 확인하세요">
+            </div>
+            <div class="form-group mt-3">
+                <label for="name">이름</label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="이름을 입력하세요">
+            </div>
+            <div class="form-group mt-3">
+                <label for="birthday">생일</label>
+                <input type="date" id="birthday" name="birthday" class="form-control">
+            </div>
+            <div class="d-grid mt-4">
+                <button type="button" class="btn btn-primary" onclick="submitForm()">가입하기</button>
+            </div>
+        </form>
+        <div class="d-grid mt-3">
+            <button class="btn btn-danger" onclick="location.href='home.html'"
+                    th:onclick="|location.href='@{/}'|"
+                    type="button">취소</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitForm() {
+        const form = document.getElementById('signupForm');
+
+        const formData = {
+            loginId: form.loginId.value,
+            password: form.password.value,
+            checkPassword: form.checkPassword.value,
+            name: form.name.value,
+            birthday: form.birthday.value
+        };
+
+        fetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("회원가입이 완료되었습니다!");
+                    window.location.href = '/login';
+                } else {
+                    return response.json().then(data => {
+                        alert("에러: " + data.map(error => error.defaultMessage).join("\n"));
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("회원가입 중 오류가 발생했습니다.");
+            });
+    }
+</script>
+</body>
+</html>
