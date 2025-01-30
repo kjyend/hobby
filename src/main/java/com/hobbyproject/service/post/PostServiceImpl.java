@@ -117,6 +117,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public PostPagingResponse getFindTitleList(String title, SearchDto postSearch) {
+        List<PostListDto> postTitleContains = postRepository.findPostTitleContains(title, postSearch);
+        long totalPostCount = postRepository.postCount();
+        return new PostPagingResponse(postTitleContains, totalPostCount);
+    }
+
+    @Override
     public Long getViewCount(Long postId) {
         return postRepository.findCountByPostId(postId);
     }

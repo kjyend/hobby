@@ -44,4 +44,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .where(QPost.post.postId.eq(postId))
                 .execute();
     }
+
+    @Override
+    public List<PostListDto> findPostTitleContains(String title, SearchDto Searchdto) {
+        return jpaQueryFactory.select(
+                        Projections.fields(PostListDto.class,
+                                QPost.post.postId,
+                                QPost.post.title,
+                                QPost.post.count,
+                                QPost.post.likeCount,
+                                QPost.post.createdDate,
+                                QPost.post.member.name
+                        ))
+                .from(QPost.post)
+                .where(QPost.post.title.contains(title))
+                .limit(Searchdto.getSize())
+                .offset(Searchdto.getOffset())
+                .orderBy(QPost.post.postId.desc())
+                .fetch();
+    }
 }

@@ -32,9 +32,14 @@ public class PostRestController {
 
     @GetMapping("/posts")
     public PostPagingResponse getList(@RequestParam(name = "page",defaultValue = "1") int page,
-                                      @RequestParam(name = "size",defaultValue = "10") int size) {
+                                      @RequestParam(name = "size",defaultValue = "10") int size,
+                                      @RequestParam(name = "searchTitle",defaultValue = "") String title) {
         SearchDto postSearch = new SearchDto(page, size);
-        return postService.getList(postSearch);
+        if(title.isEmpty()){
+            return postService.getList(postSearch);
+        }else{
+            return postService.getFindTitleList(title, postSearch);
+        }
     }
 
     @PostMapping("/post/write")

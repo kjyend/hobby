@@ -11,4 +11,6 @@ public interface PostRepositoryCustom {
     long postCount();
 
     void updateViewCount(Long postId, Long updatedCount);
+
+    List<PostListDto> findPostTitleContains(String title, SearchDto Searchdto);
 }

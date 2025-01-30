@@ -18,12 +18,13 @@ public interface PostService {
 
     boolean postDelete(Long postId, String loginId);
 
-
     PostResponseDto findPost(Long postId);
 
     boolean postMemberCheck(Long postId, String loginId);
 
     PostPagingResponse getList(SearchDto postSearch);
+
+    PostPagingResponse getFindTitleList(String title, SearchDto postSearch);
 
     Long getViewCount(Long postId);
 
