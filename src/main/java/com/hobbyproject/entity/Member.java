@@ -16,8 +16,6 @@ import java.util.List;
 public class Member extends BaseEntity{
 
     @Id
-    @GeneratedValue
-    private Long memberId;
     private String loginId;
     private String password;
     private String name;
@@ -33,8 +31,7 @@ public class Member extends BaseEntity{
     private List<PostLike> postLikes=new ArrayList<>();
 
     @Builder
-    public Member(Long memberId, String loginId, String password, String name, LocalDate birthday) {
-        this.memberId = memberId;
+    public Member(String loginId, String password, String name, LocalDate birthday) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
