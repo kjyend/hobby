@@ -35,7 +35,7 @@ class PostRepositoryTest {
         int batchSize = 1000; // 한 번에 처리할 데이터 크기
         List<Post> posts = new ArrayList<>();
 
-        Member member = memberRepository.save(Member.builder().build());
+        Member member = memberRepository.save(Member.builder().loginId("1234").build());
 
         for (long i = 1L; i <= 10_000L; i++) {
             Post post = Post.builder()

@@ -20,13 +20,13 @@ public class PostLikeRestController {
 
     @PostMapping("/post/{postId}/like")
     public ResponseEntity<String> upLikeCount(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails) {
-        postLikeService.addPostLikeAndIncrementCount(postId, userDetails.getUsername());
+        postLikeService.likePost(postId, userDetails.getUsername());
         return ResponseEntity.ok("좋아요를 눌렀습니다.");
     }
 
     @PostMapping("/post/{postId}/like/cancel")
     public ResponseEntity<String> downLikeCount(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails){
-        postLikeService.cancelPostLikeAndDecrementCount(postId, userDetails.getUsername());
+        postLikeService.unlikePost(postId, userDetails.getUsername());
         return ResponseEntity.ok("좋아요를 취소 했습니다.");
     }
 
