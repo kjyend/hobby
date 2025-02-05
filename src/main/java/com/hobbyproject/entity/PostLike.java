@@ -24,8 +24,8 @@ public class PostLike extends BaseEntity {
     private Member member;
 
     @Builder
-    public PostLike(Post post, Member member) {
-        this.post = post;
-        this.member = member;
+    public PostLike(Long postId, String memberName) {
+        this.post = Post.builder().postId(postId).build();
+        this.member = Member.builder().loginId(memberName).build();
     }
 }
