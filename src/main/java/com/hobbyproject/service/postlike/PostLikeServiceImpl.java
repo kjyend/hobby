@@ -1,73 +1,81 @@
 package com.hobbyproject.service.postlike;
 
-import com.hobbyproject.entity.Member;
-import com.hobbyproject.entity.Post;
 import com.hobbyproject.entity.PostLike;
-import com.hobbyproject.repository.member.MemberRepository;
-import com.hobbyproject.repository.post.PostRepository;
 import com.hobbyproject.repository.postlike.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
 public class PostLikeServiceImpl implements PostLikeService {
 
-    private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final PostLikeRepository postLikeRepository;
+    private static final String LIKE_KEY = "post:likes:";
 
     @Override
     @Transactional
-    public Post addPostLikeAndIncrementCount(Long boardId, String memberName) {
-        Post post = postRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Post값이 없습니다."));
-        Member member=memberRepository.findByLoginId(memberName).orElseThrow(()->new IllegalArgumentException("같은 이름이 없습니다."));
-        PostLike postLike = postLikeRepository.findByMemberAndPost(member, post);
-
-        if(postLike != null) {
-            throw new IllegalArgumentException("좋아요를 이미 눌렀습니다.");
-        } else {
-            postLikeRepository.save(PostLike.builder().member(member).post(post).build());
-            updateLikeCount(post);
-        }
-        return postRepository.save(post);
-    }
-
-    private void updateLikeCount(Post post) {
-        Long count = postLikeRepository.countAllByPost(post);
-        post.updateLikeCount(count);
+    public void likePost(Long postId, String memberName) {
+        redisTemplate.opsForSet().add(LIKE_KEY + postId, memberName);
     }
 
     @Override
     @Transactional
-    public Post cancelPostLikeAndDecrementCount(Long boardId, String memberName) {
-        Post post = postRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Post값이 없습니다."));
-        Member member=memberRepository.findByLoginId(memberName).orElseThrow(()->new IllegalArgumentException("같은 이름이 없습니다."));
-        PostLike postLike = postLikeRepository.findByMemberAndPost(member, post);
-
-        if(postLike != null) {
-            postLikeRepository.delete(postLike);
-            updateLikeCount(post);
-        }else{
-            throw new IllegalArgumentException("좋아요를 누르지 않았습니다.");
-        }
-        return postRepository.save(post);
+    public void unlikePost(Long postId, String memberName) {
+        redisTemplate.opsForSet().remove(LIKE_KEY + postId, memberName);
     }
 
     @Override
     public boolean isUserLikedPost(Long postId, String memberName) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        Member member = memberRepository.findByLoginId(memberName)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        return postLikeRepository.existsByPostAndMember(post,member);
+        return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(LIKE_KEY + postId, memberName));
     }
 
     @Override
     public Long getLikeCount(Long postId) {
-        return postRepository.findLikeCountByPostId(postId);
+        return redisTemplate.opsForSet().size(LIKE_KEY + postId);
     }
 
+    @Scheduled(cron = "0 */1 * * * *")
+    @Async
+    public void syncLikesToDB() {
+        Set<String> keys = redisTemplate.keys(LIKE_KEY + "*");
+        ConcurrentHashMap<Long, Set<Object>> redisLikeData = new ConcurrentHashMap<>();
+        if (keys != null) {
+            for (String key : keys) {
+                Long postId = Long.parseLong(key.replace("post:likes:", ""));
+                Set<Object> members = redisTemplate.opsForSet().members(key);
+                redisLikeData.put(postId, members);
+            }
+        }
+
+        List<PostLike> dbLikes = postLikeRepository.findAll();
+        for (PostLike like : dbLikes) {
+            Long postId = like.getPost().getPostId();
+            String memberName = like.getMember().getLoginId();
+
+            if (!redisLikeData.containsKey(postId) || !redisLikeData.get(postId).contains(memberName)) {
+                postLikeRepository.delete(like);
+            }
+        }
+
+        for (Map.Entry<Long, Set<Object>> entry : redisLikeData.entrySet()) {
+            Long postId = entry.getKey();
+            Set<Object> members = entry.getValue();
+
+            for (Object memberName : members) {
+                if (!postLikeRepository.existsByPost_PostIdAndMember_LoginId(postId, memberName.toString())) {
+                    postLikeRepository.save(new PostLike(postId, memberName.toString()));
+                }
+            }
+        }
+    }
 }

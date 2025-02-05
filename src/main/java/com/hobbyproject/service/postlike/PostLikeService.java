@@ -1,12 +1,11 @@
 package com.hobbyproject.service.postlike;
 
-import com.hobbyproject.entity.Post;
 
 public interface PostLikeService {
 
-    Post addPostLikeAndIncrementCount(Long boardId, String memberName);
+    void likePost(Long postId, String memberName);
 
-    Post cancelPostLikeAndDecrementCount(Long boardId, String memberName);
+    void unlikePost(Long postId, String memberName);
 
     boolean isUserLikedPost(Long postId, String memberName);
 
