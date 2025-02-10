@@ -14,6 +14,7 @@ public class PostResponseDto {
     private Long id;
     private String title;
     private String content;
+    private String loginId;
     private Long count;
     private Long likeCount;
     private List<String> imageUrls;
@@ -25,6 +26,7 @@ public class PostResponseDto {
         this.id = post.getPostId();
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.loginId=post.getMember().getLoginId();
         this.count = post.getCount();
         this.likeCount = post.getLikeCount();
         this.imageUrls = post.getUploadFiles().stream()
