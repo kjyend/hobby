@@ -15,6 +15,7 @@
 
     <h2 th:text="${post.title}">제목</h2>
     <p th:text="${post.content}">내용</p>
+    <p th:text="${post.loginId}">작성자</p>
 
     <div class="image-container mt-4" th:if="${#lists.size(post.imageUrls) > 0}">
         <h4>Images:</h4>
