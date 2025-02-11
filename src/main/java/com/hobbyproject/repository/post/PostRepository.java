@@ -11,4 +11,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,PostRepository
 
     @Query("SELECT p.likeCount FROM Post p WHERE p.postId = :id")
     Long findLikeCountByPostId(@Param("id") Long postId);
+
+    @Query("SELECT p.member.loginId FROM Post p WHERE p.postId = :id")
+    String findPostOwnerLoginId(@Param("id") Long postId);
 }
