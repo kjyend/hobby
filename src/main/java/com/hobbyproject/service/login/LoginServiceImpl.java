@@ -32,6 +32,6 @@ public class LoginServiceImpl implements LoginService{
 
     @Override
     public boolean checkLoginIdDup(String loginId) {
-        return memberRepository.findByLoginId(loginId).orElse(null) != null;
+        return memberRepository.findById(loginId).orElse(null) != null;
     }
 }

@@ -33,7 +33,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void postCreate(PostWriteDto postWriteDto, String loginId, List<MultipartFile> images) {
 
-        Member memberCheck = memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
+        Member memberCheck = memberRepository.findById(loginId).orElseThrow(IllegalArgumentException::new);
 
         Post post=Post.builder()
                 .title(postWriteDto.getTitle())
@@ -51,7 +51,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public boolean postEdit(PostEditDto postEditDto, String loginId, List<MultipartFile> images) {
         try {
-            Member memberCheck = memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
+            Member memberCheck = memberRepository.findById(loginId).orElseThrow(IllegalArgumentException::new);
 
             Post post = postRepository.findById(postEditDto.getPostId()).orElseThrow(IllegalArgumentException::new);
 
@@ -76,7 +76,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public boolean postDelete(Long postId, String loginId) {
         try {
-            Member memberCheck = memberRepository.findByLoginId(loginId)
+            Member memberCheck = memberRepository.findById(loginId)
                     .orElseThrow(() -> new IllegalArgumentException("회원이 일치하지 않습니다."));
 
             Post post = postRepository.findById(postId)
@@ -101,7 +101,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public boolean postMemberCheck(Long postId, String loginId) {
 
-        Member member = memberRepository.findByLoginId(loginId).orElseThrow(IllegalArgumentException::new);
+        Member member = memberRepository.findById(loginId).orElseThrow(IllegalArgumentException::new);
 
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
