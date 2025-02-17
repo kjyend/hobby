@@ -32,9 +32,8 @@
     </div>
 
     <div class="like-container mt-4">
-        <button id="like-button" class="btn btn-outline-primary"
-                th:onclick="'toggleLike('+${post.id}+');'">
-            좋아요 (<span th:text="${post.likeCount}">0</span>)
+        <button id="like-button" class="btn btn-outline-primary">
+            좋아요 <span id="like-count" th:text="${post.likeCount}"/>
         </button>
     </div>
 
@@ -158,13 +157,20 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         const postId = [[${post.id}]];
+
         loadComments(postId);
+
         fetch(`/post/${postId}/like/status`)
             .then(response => response.json())
             .then(data => {
                 liked = data.liked;
                 updateLikeUI(postId);
             });
+
+        document.getElementById('like-button').addEventListener('click', function (event) {
+            event.stopPropagation();  // 부모 요소로 이벤트가 전달되지 않도록 막음
+            toggleLike(postId);
+        });
     });
 
     function toggleLike(postId) {
@@ -192,22 +198,20 @@
 
     function updateLikeUI(postId) {
         const likeButton = document.getElementById('like-button');
-        const likeCountElement = document.getElementById('like-count');
+        const likeCountElement = likeButton.querySelector('span');
 
         fetch(`/post/${postId}/like/count`)
             .then(response => response.json())
             .then(data => {
-                likeCountElement.textContent = data.count;
+                likeCountElement.textContent = data.count;  // span 태그 내부 값만 변경
             });
 
         if (liked) {
             likeButton.classList.remove('btn-outline-primary');
             likeButton.classList.add('btn-primary');
-            likeButton.textContent = `좋아요 (${likeCountElement.textContent})`;
         } else {
             likeButton.classList.remove('btn-primary');
             likeButton.classList.add('btn-outline-primary');
-            likeButton.textContent = `좋아요 (${likeCountElement.textContent})`;
         }
     }
 </script>
