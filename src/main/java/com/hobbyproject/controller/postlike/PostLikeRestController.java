@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Controller
@@ -33,7 +34,7 @@ public class PostLikeRestController {
     @GetMapping("/post/{postId}/like/status")
     public ResponseEntity<Map<String, Object>> getLikeStatus(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails) {
         boolean liked = postLikeService.isUserLikedPost(postId, userDetails.getUsername());
-        return ResponseEntity.ok(Map.of("liked", liked));
+        return ResponseEntity.ok(Collections.singletonMap("liked", liked));
     }
 
     @GetMapping("/post/{postId}/like/count")
