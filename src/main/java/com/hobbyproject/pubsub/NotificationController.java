@@ -14,7 +14,7 @@ public class NotificationController {
     private final SseEmitters sseEmitters;
 
     @GetMapping("/subscribe/{userId}")
-    public SseEmitter subscribe(@PathVariable String userId) {
+    public SseEmitter subscribe(@PathVariable("userId") String userId) {
         SseEmitter emitter = sseEmitters.addEmitter(userId);
 
         emitter.onCompletion(() -> {
