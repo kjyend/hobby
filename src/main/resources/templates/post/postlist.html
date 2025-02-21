@@ -70,7 +70,7 @@
     <!-- 알림 아이콘 및 배지 -->
     <div th:if="${isLoggedIn}" id="notification-icon">
         <span class="icon">🔔</span>
-        <span id="notification-badge" class="badge">3</span>
+        <span id="notification-badge" class="badge">0</span>
     </div>
     <!-- 알림 드롭다운 -->
     <div th:if="${isLoggedIn}" id="notification-dropdown" class="hidden">
@@ -156,8 +156,12 @@
 
         function toggleNotifications() {
             if (dropdown.classList.contains("hidden")) {
-                badge.style.display = "none";
+                // 1️⃣ 알림 드롭다운을 보여줌
                 dropdown.classList.remove("hidden");
+
+                // 2️⃣ 숫자 초기화 (뱃지 숨김)
+                badge.textContent = "";
+                badge.style.display = "none";
             } else {
                 dropdown.classList.add("hidden");
             }
