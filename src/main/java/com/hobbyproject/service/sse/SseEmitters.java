@@ -1,13 +1,13 @@
-package com.hobbyproject.pubsub;
+package com.hobbyproject.service.sse;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@Service
 public class SseEmitters {
     private final Map<String, SseEmitter> emitters=new ConcurrentHashMap<>();
 

@@ -2,6 +2,7 @@ package com.hobbyproject.pubsub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hobbyproject.dto.notification.NotificationMessage;
+import com.hobbyproject.service.sse.SseEmitters;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;

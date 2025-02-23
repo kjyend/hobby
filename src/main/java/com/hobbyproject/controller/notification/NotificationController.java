@@ -1,5 +1,6 @@
-package com.hobbyproject.pubsub;
+package com.hobbyproject.controller.notification;
 
+import com.hobbyproject.service.sse.SseEmitters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

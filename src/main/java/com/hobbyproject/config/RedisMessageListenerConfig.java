@@ -1,5 +1,6 @@
-package com.hobbyproject.pubsub;
+package com.hobbyproject.config;
 
+import com.hobbyproject.pubsub.RedisSubscriber;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
