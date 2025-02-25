@@ -7,6 +7,15 @@ V2에서는 사용자가 각 게시글에 댓글을 달 수 있는 기능과 게
 취미를 기록하는 즐거움을 통해 더 많은 사람들과 소통하고, 새로운 취미를 발견하는 기회를 가질 수 있습니다. 
 나만의 취미 세상을 만들어보세요!
 
+
+| **버전** | **링크**       |
+|----------|----------------|
+| 취미 기록 게시판 V1       | [취미 Web Page V1](https://github.com/kjyend/hobbyproject) |
+| 취미 기록 게시판 V2       | [취미 Web Page V2](https://github.com/kjyend/hobbyprojectV2) |
+| 취미 기록 게시판 V3       | [취미 Web Page V3](https://github.com/kjyend/hobbyprojectV3) |
+| 취미 기록 게시판 V4       | [취미 Web Page V4](https://github.com/kjyend/hobbyprojectV4) |
+| 취미 기록 게시판 V5       | [취미 Web Page V4](https://github.com/kjyend/hobbyprojectV5) |
+
 ## 개요
 
 개발 기간 : 2024.9.9 ~ 2024.9.24
@@ -30,7 +39,7 @@ $ ./gradlew bootRun
 
 Language (BE) : Java
 
-Language (FE) : JavaScript, HTML, CSS
+Language (FE) : JavaScript
 
 Library & Framework : Spring Boot, Spring, Thymeleaf, Hibernate 
 
