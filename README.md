@@ -2,7 +2,7 @@
 
 취미 기록 Web Page V3
 이 프로젝트는 개인의 취미를 기록하고 공유할 수 있는 웹사이트입니다. 
-V3에서는 N+1문제 해결 및 부하 테스트, 모니터링 시스템을 도입했습니다.
+V3에서는 **N+1문제 해결 및 부하 테스트, 모니터링 시스템**을 도입했습니다.
 사용자는 다양한 취미를 자유롭게 등록하고, 활동 내용을 정리하여 언제든지 돌아볼 수 있습니다. 
 취미를 기록하는 즐거움을 통해 더 많은 사람들과 소통하고, 새로운 취미를 발견하는 기회를 가질 수 있습니다. 
 나만의 취미 세상을 만들어보세요!
@@ -25,8 +25,8 @@ V3에서는 N+1문제 해결 및 부하 테스트, 모니터링 시스템을 도
 
 Installation
 ```
-$ git clone https://github.com/kjyend/hobbyproject.git
-$ cd hobbyproject
+$ git clone https://github.com/kjyend/hobbyprojectV3.git
+$ cd hobbyprojectV3
 ```
 Backend
 ```
@@ -44,7 +44,7 @@ Library & Framework : Spring Boot, Spring, Thymeleaf, Hibernate
 
 Database : MySQL
 
-ORM : JPA, Hibernate 
+ORM : JPA
 
 Environment : IntelliJ, Git, GitHub 
 
