@@ -62,6 +62,7 @@ Performance Testing : JMeter
 ✅ 검색 기능 추가
 
 * 기본적인 키워드 검색 기능 구현
+
 ✅ 실시간 알림 시스템 구축
 
 * Redis SSE를 활용한 실시간 알림 시스템 구현
