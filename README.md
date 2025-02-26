@@ -26,8 +26,8 @@ V2에서는 사용자가 각 게시글에 댓글을 달 수 있는 기능과 게
 
 Installation
 ```
-$ git clone https://github.com/kjyend/hobbyproject.git
-$ cd hobbyproject
+$ git clone https://github.com/kjyend/hobbyprojectV2.git
+$ cd hobbyprojectV2
 ```
 Backend
 ```
@@ -45,7 +45,7 @@ Library & Framework : Spring Boot, Spring, Thymeleaf, Hibernate
 
 Database : MySQL
 
-ORM : JPA, Hibernate 
+ORM : JPA
 
 Environment : IntelliJ, Git, GitHub 
 
