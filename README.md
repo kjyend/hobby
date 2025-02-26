@@ -40,7 +40,7 @@ Library & Framework : Spring Boot, Spring, Thymeleaf, Hibernate
 
 Database : MySQL
 
-ORM : JPA, Hibernate 
+ORM : JPA
 
 Environment : IntelliJ, Git, GitHub 
 
