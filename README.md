@@ -61,6 +61,12 @@ Performance Testing : JMeter
 * **제목**: 최대 10글자까지만 표시
 * **작성일시, 조회수, 작성자** 정보 추가
 
+✅ 댓글 조회 시 DTO 변환 방식 개선 → QueryDSL Projections 적용으로 최적화
+
+* 엔티티 조회 후 Stream을 이용한 DTO 변환 → 불필요한 객체 생성 비용 발생
+* QueryDSL Projections.fields를 사용한 직접 DTO 매핑 적용
+* 불필요한 엔티티 로딩 제거, 쿼리 성능 최적화
+
 ## 화면 구성
 
 게시글 리스트 당일에 올린글과 다른 날 올린글
