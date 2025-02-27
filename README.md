@@ -52,10 +52,22 @@ Monitoring : Prometheus, Grafana
 
 Performance Testing : JMeter
 
-## 트러블 슈팅
+## V3 주요 변경 사항
 
-* 댓글 조회 시 발생하는 N+1 문제 발생 fetch join으로 문제 해결
-* 게시글 조회 시 페이징 처리에서 발생하는 N+1 문제 발생, limit 메서드 사용으로 fetch join시 OOM이 발생 따라서 @BatchSize로 문제 해결
+✅ 댓글 조회 시 N+1 문제 발생 → Fetch Join으로 해결
+
+* 댓글 조회 시 연관된 엔티티를 개별적으로 불러오는 N+1 문제 발생
+* Fetch Join을 사용하여 한 번의 쿼리로 해결하여 성능 최적화
+
+✅ 게시글 조회 시 페이징 처리에서 N+1 문제 발생 → @BatchSize 적용으로 해결
+
+* 페이징 처리 시 limit을 사용하면서 Fetch Join 적용 → Out Of Memory(OOM) 발생
+* @BatchSize 적용을 통해 JPA의 In Query 방식으로 데이터 조회 최적화
+
+✅ 시스템 모니터링 도입
+
+* 문제 상황을 발생하기 위해서 Jmeter를 통해 부하 테스트 실행
+* Prometheus, Grafana 도입으로 모니터링 시스템 구축 및 부하 테스트 데이터 수집
 
 
 ## ERD
