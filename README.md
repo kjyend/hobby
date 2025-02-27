@@ -56,8 +56,8 @@ Performance Testing : JMeter
 
 ✅ 댓글 조회 시 N+1 문제 발생 → Fetch Join으로 해결
 
-* 댓글 조회 시 연관된 엔티티를 개별적으로 불러오는 N+1 문제 발생
-* Fetch Join을 사용하여 한 번의 쿼리로 해결하여 성능 최적화
+* 댓글 조회 시 Member 엔티티를 개별적으로 불러오는 N+1 문제 발생
+* Fetch Join을 사용하여 N+1 문제 해결 및 성능 최적화
 
 ✅ 게시글 조회 시 페이징 처리에서 N+1 문제 발생 → @BatchSize 적용으로 해결
 
