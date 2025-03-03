@@ -59,10 +59,10 @@ Performance Testing : JMeter
 * 댓글 조회 시 Member 엔티티를 개별적으로 불러오는 N+1 문제 발생
 * Fetch Join을 사용하여 N+1 문제 해결 및 성능 최적화
 
-✅ 게시글 조회 시 페이징 처리에서 N+1 문제 발생 → @BatchSize 적용으로 해결
+✅ Post에서 deleteAll()에서 N+1 문제 발생 → @BatchSize 적용으로 해결
 
-* 페이징 처리 시 limit을 사용하면서 Fetch Join 적용 → Out Of Memory(OOM) 발생
-* @BatchSize 적용을 통해 JPA의 In Query 방식으로 데이터 조회 최적화
+* Post 엔티티의 다중 Collection fetch join(~ToMany)으로 deleteAll() 시 MultipleBagFetchException 발생
+* @BatchSize 적용으로 N+1 문제 해결 및 성능 최적화
 
 ✅ 시스템 모니터링 도입
 
