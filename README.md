@@ -61,7 +61,7 @@ Performance Testing : JMeter
 
 ✅ Post에서 deleteAll()에서 N+1 문제 발생 → @BatchSize 적용으로 해결
 
-* Post 엔티티의 다중 Collection fetch join(~ToMany)으로 deleteAll() 시 MultipleBagFetchException 발생
+* Post 엔티티의 다중 Collection fetch join(~ToMany)으로 deleteAll() 시 N+1 문제 발생
 * @BatchSize 적용으로 N+1 문제 해결 및 성능 최적화
 
 ✅ 시스템 모니터링 도입
