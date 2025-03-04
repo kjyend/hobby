@@ -286,7 +286,17 @@
 
         // 페이지 로드 시 첫 페이지 호출
         loadPosts(1);
+
+        document.addEventListener("click", function (event) {
+            if (event.target.matches("td a")) {
+                event.preventDefault();
+                const postId = event.target.getAttribute("href").split("/").pop();
+                incrementViewCount(postId);
+                window.location.href = event.target.href; // 원래 링크 이동
+            }
+        });
     });
+
 </script>
 
 </body>
