@@ -10,12 +10,13 @@
     <div class="mt-3">
         <button class="btn btn-secondary" type="button"
                 onclick="location.href='home.html'"
-                th:onclick="|location.href='@{/}'|">홈 화면으로</button>
+                th:onclick="|location.href='@{/post}'|">홈 화면으로</button>
     </div>
 
     <h2 th:text="${post.title}">제목</h2>
+    작성자: <span th:text="${post.name}">작성자</span>
     <p th:text="${post.content}">내용</p>
-    <p th:text="${post.loginId}">작성자</p>
+
 
     <div class="image-container mt-4" th:if="${#lists.size(post.imageUrls) > 0}">
         <h4>Images:</h4>
