@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>취미 게시글</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* --- 검색창 스타일 --- */
+        #searchTitle {
+            border: 2px solid #007bff;
+            border-radius: 20px;
+            padding: 8px 15px;
+            outline: none;
+            margin-right: 5px;
+        }
+        .btn-outline-primary {
+            border-radius: 10px;
+        }
+        /* --- 알림 아이콘 흔들리는 애니메이션 --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+        #notification-icon.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        #notification-icon {
+            position: relative;
+            display: inline-block;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            font-size: 12px;
+            padding: 4px 6px;
+            border-radius: 50%;
+            display: none;
+        }
+        /* --- 알림 드롭다운 스타일 --- */
+        #notification-dropdown {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            width: 200px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+            display: none;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <!-- 제목 -->
+    <h2 class="text-center mb-4">취미 게시글</h2>
+
+    <!-- 알림 아이콘 및 배지 -->
+    <div th:if="${isLoggedIn}" id="notification-icon">
+        <span class="icon">🔔</span>
+        <span id="notification-badge" class="badge">0</span>
+    </div>
+    <!-- 알림 드롭다운 -->
+    <div th:if="${isLoggedIn}" id="notification-dropdown" class="hidden">
+        <ul id="notification-list">
+            <li>새로운 알림 1</li>
+            <li>새로운 알림 2</li>
+            <li>새로운 알림 3</li>
+        </ul>
+    </div>
+
+    <!-- 로그인/글작성/로그아웃 버튼 -->
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-outline-secondary" th:if="${isLoggedIn}"
+                th:onclick="|location.href='@{/logout}'|" type="button">로그아웃</button>
+        <button class="btn btn-primary ms-2" th:if="${isLoggedIn}"
+                th:onclick="|location.href='@{/post/write}'|" type="button">글 작성하기</button>
+        <button class="btn btn-success ms-2" th:if="${!isLoggedIn}"
+                th:onclick="|location.href='@{/login}'|" type="button">로그인</button>
+    </div>
+
+    <!-- 검색 폼 -->
+    <div class="d-flex justify-content-end mb-3">
+        <form id="searchForm" class="d-flex">
+            <input type="text" id="searchTitle" placeholder="제목 검색">
+            <button type="submit" class="btn btn-outline-primary">검색</button>
+        </form>
+    </div>
+
+    <!-- 게시물 테이블 -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered text-center">
+            <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+                <th>조회수</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 게시물은 JavaScript로 동적으로 로드됩니다 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 페이징 영역 -->
+    <div class="d-flex justify-content-center mt-3">
+        <nav>
+            <ul class="pagination" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<!-- 스크립트 영역 -->
+<script th:inline="javascript">
+    // 로그인된 사용자 아이디 (없다면 null 또는 0)
+    const userId = [[${userId}]];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("User ID:", userId);
+
+        // ===========================
+        // 1) SSE 알림 관련 코드
+        // ===========================
+        const icon = document.getElementById("notification-icon");
+        const badge = document.getElementById("notification-badge");
+        const dropdown = document.getElementById("notification-dropdown");
+        const notificationList = document.getElementById("notification-list");
+
+        function showNotification(message) {
+            badge.style.display = "inline-block";
+            badge.textContent = parseInt(badge.textContent || 0) + 1;
+            const newItem = document.createElement("li");
+            newItem.textContent = message;
+            notificationList.prepend(newItem);
+            icon.classList.add("shake");
+            icon.addEventListener("animationend", () => {
+                icon.classList.remove("shake");
+            }, { once: true });
+            dropdown.classList.remove("hidden");
+        }
+
+        function toggleNotifications() {
+            if (dropdown.classList.contains("hidden")) {
+                // 1️⃣ 알림 드롭다운을 보여줌
+                dropdown.classList.remove("hidden");
+
+                // 2️⃣ 숫자 초기화 (뱃지 숨김)
+                badge.textContent = "";
+                badge.style.display = "none";
+            } else {
+                dropdown.classList.add("hidden");
+            }
+        }
+        icon.addEventListener("click", toggleNotifications);
+
+        let eventSource;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5; // 최대 5번까지 재연결 시도
+        const reconnectInterval = 3000;
+
+        function connectSSE() {
+            if (!userId) return;
+
+            eventSource = new EventSource(`/notifications/subscribe/${userId}`);
+
+            eventSource.addEventListener("notification", function (event) {
+                showNotification(event.data);
+                reconnectAttempts = 0; // 알림을 정상적으로 받으면 재연결 횟수 초기화
+            });
+
+            eventSource.onerror = function () {
+                console.error("SSE 연결 끊어짐. 재연결 시도 중...");
+                eventSource.close();
+
+                reconnectAttempts++;
+                if (reconnectAttempts <= maxReconnectAttempts) {
+                    setTimeout(connectSSE, reconnectInterval);
+                } else {
+                    console.error("SSE 재연결 횟수 초과. 중단.");
+                }
+            };
+        }
+
+        connectSSE();
+
+        // =================================
+        // 2) 게시글 검색 & 페이징 기능
+        // =================================
+        let currentPage = 1;
+        const pageSize = 10;
+        let currentSearchTitle = "";
+
+        document.getElementById('searchForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            currentSearchTitle = document.getElementById('searchTitle').value;
+            loadPosts(1);
+        });
+
+        // 게시물 목록 로드 함수
+        function loadPosts(page) {
+            let url = `/posts?page=${page}&size=${pageSize}`;
+            if (currentSearchTitle) {
+                url += `&searchTitle=${encodeURIComponent(currentSearchTitle)}`;
+            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("받은 데이터:", data);
+                    const postList = document.querySelector('tbody');
+                    postList.innerHTML = '';
+                    data.posts.forEach(post => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+              <td>${post.postId}</td>
+              <td><a href="/post/${post.postId}" onclick="incrementViewCount(${post.postId})">${post.title}</a></td>
+              <td>${post.name}</td>
+              <td>${formatDate(post.createdDate)}</td>
+              <td>${post.count}</td>
+            `;
+                        postList.appendChild(row);
+                    });
+                    const totalPages = Math.ceil(data.totalPostCount / pageSize);
+                    updatePagination(page, totalPages);
+                    currentPage = page;
+                })
+                .catch(error => console.error('Error fetching posts:', error));
+        }
+
+        // 페이징 업데이트 함수
+        function updatePagination(current, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            // 페이지가 없으면 표시하지 않음
+            if (totalPages < 1) {
+                return;
+            }
+
+            const maxPagesToShow = 10;
+            let pageRangeStart = Math.floor((current - 1) / maxPagesToShow) * maxPagesToShow + 1;
+            let pageRangeEnd = Math.min(pageRangeStart + maxPagesToShow - 1, totalPages);
+
+            for (let i = pageRangeStart; i <= pageRangeEnd; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (i === current ? ' active' : '');
+                const a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = i;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    loadPosts(i);
+                });
+                li.appendChild(a);
+                pagination.appendChild(li);
+            }
+        }
+
+        // 날짜 포맷 함수 (오늘이면 시간, 아니면 날짜)
+        function formatDate(createdDate) {
+            const today = new Date().toISOString().substring(0, 10);
+            const datePart = createdDate.substring(0, 10);
+            return datePart === today ? createdDate.substring(11, 16) : datePart;
+        }
+
+        // 조회수 증가 함수
+        function incrementViewCount(postId) {
+            fetch(`/post/${postId}/count`, { method: 'POST' })
+                .catch(error => console.error('Error updating view count:', error));
+        }
+
+        // 페이지 로드 시 첫 페이지 호출
+        loadPosts(1);
+
+        document.addEventListener("click", function (event) {
+            if (event.target.matches("td a")) {
+                event.preventDefault();
+                const postId = event.target.getAttribute("href").split("/").pop();
+                incrementViewCount(postId);
+                window.location.href = event.target.href; // 원래 링크 이동
+            }
+        });
+    });
+
+</script>
+
+</body>
+</html>
