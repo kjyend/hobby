@@ -16,10 +16,14 @@ import java.util.List;
 public class Member extends BaseEntity{
 
     @Id
+    @Column(unique = true)
     private String loginId;
     private String password;
     private String name;
     private LocalDate birthday;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ROLE", nullable = false)
+    private RoleType role;
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Post> posts=new ArrayList<>();
@@ -36,5 +40,6 @@ public class Member extends BaseEntity{
         this.password = password;
         this.name = name;
         this.birthday = birthday;
+        this.role= RoleType.valueOf("USER");
     }
 }
