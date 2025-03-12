@@ -1,9 +1,11 @@
 package com.hobbyproject.controller.login;
 
+import com.hobbyproject.dto.member.request.LoginDto;
 import com.hobbyproject.dto.member.request.SignupDto;
 import com.hobbyproject.service.login.LoginService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -36,4 +38,9 @@ public class LoginRestController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("login")
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto, BindingResult bindingResult){
+        String token = loginService.login(loginDto);
+        return ResponseEntity.status(HttpStatus.OK).body(token);
+    }
 }
