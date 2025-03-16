@@ -65,11 +65,9 @@
     <div class="content-box">
         <h2>메인 화면</h2>
 
-        <div>
-            <button th:if="${isLoggedIn}" class="btn btn-custom btn-custom-secondary"
-                    onclick="logout()">로그아웃</button>
-            <button th:if="${!isLoggedIn}" class="btn btn-custom btn-custom-primary"
-                    th:onclick="|location.href='@{/login}'|">로그인</button>
+        <div id="button-container" class="d-flex flex-column align-items-center">
+            <button id="logout-btn" class="btn btn-custom btn-custom-secondary" style="display: none;" onclick="logout()">로그아웃</button>
+            <button id="login-btn" class="btn btn-custom btn-custom-primary" style="display: none;" onclick="location.href='/login'">로그인</button>
         </div>
 
         <div class="mt-5">
@@ -78,27 +76,45 @@
     </div>
 </div>
 
+
 <script>
-    function logout() {
-        fetch('/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '/';
-                } else {
-                    return response.json().then(data => {
-                        alert("에러: " + data.map(error => error.defaultMessage).join("\n"));
-                    });
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("로그아웃 중 오류가 발생했습니다.");
+    async function checkLoginStatus() {
+        const token = localStorage.getItem("accessToken");
+        const buttonContainer = document.getElementById("button-container");
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        if (!token) {
+            loginBtn.style.display = "block";
+            buttonContainer.style.display = "block";
+            return;
+        }
+
+        try {
+            const response = await fetch('/login/user-info', {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + token }
             });
+
+            const data = await response.json();
+            if (data.isLoggedIn && data.userId) {
+                logoutBtn.style.display = "block";
+            } else {
+                loginBtn.style.display = "block";
+            }
+        } catch (error) {
+            console.error('로그인 상태 확인 오류:', error);
+            loginBtn.style.display = "block";
+        } finally {
+            buttonContainer.style.display = "block";
+        }
+    }
+
+    checkLoginStatus();
+
+    function logout() {
+        localStorage.removeItem("accessToken");
+        location.reload();
     }
 </script>
 </body>

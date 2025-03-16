@@ -68,29 +68,26 @@
     <h2 class="text-center mb-4">취미 게시글</h2>
 
     <!-- 알림 아이콘 및 배지 -->
-    <div th:if="${isLoggedIn}" id="notification-icon">
-        <span class="icon">🔔</span>
-        <span id="notification-badge" class="badge">0</span>
-    </div>
-    <!-- 알림 드롭다운 -->
-    <div th:if="${isLoggedIn}" id="notification-dropdown" class="hidden">
-        <ul id="notification-list">
-            <li>새로운 알림 1</li>
-            <li>새로운 알림 2</li>
-            <li>새로운 알림 3</li>
-        </ul>
+    <div id="notification-container" style="display: none;">
+        <div id="notification-icon">
+            <span class="icon">🔔</span>
+            <span id="notification-badge" class="badge">0</span>
+        </div>
+        <!-- 알림 드롭다운 -->
+        <div id="notification-dropdown" class="hidden">
+            <ul id="notification-list"></ul>
+        </div>
     </div>
 
     <!-- 로그인/글작성/로그아웃 버튼 -->
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-outline-secondary" th:if="${isLoggedIn}"
-                th:onclick="|location.href='@{/logout}'|" type="button">로그아웃</button>
-        <button class="btn btn-primary ms-2" th:if="${isLoggedIn}"
-                th:onclick="|location.href='@{/post/write}'|" type="button">글 작성하기</button>
-        <button class="btn btn-success ms-2" th:if="${!isLoggedIn}"
-                th:onclick="|location.href='@{/login}'|" type="button">로그인</button>
+    <div class="d-flex justify-content-end mb-3" id="button-container" style="display: none;">
+        <button id="logout-btn" class="btn btn-outline-secondary" style="display: none;"
+                onclick="logout()" type="button">로그아웃</button>
+        <button id="write-btn" class="btn btn-primary ms-2" style="display: none;"
+                onclick="location.href='/post/write'" type="button">글 작성하기</button>
+        <button id="login-btn" class="btn btn-success ms-2" style="display: none;"
+                onclick="location.href='/login'" type="button">로그인</button>
     </div>
-
     <!-- 검색 폼 -->
     <div class="d-flex justify-content-end mb-3">
         <form id="searchForm" class="d-flex">
@@ -127,11 +124,48 @@
 
 <!-- 스크립트 영역 -->
 <script th:inline="javascript">
-    // 로그인된 사용자 아이디 (없다면 null 또는 0)
-    const userId = [[${userId}]];
+
 
     document.addEventListener("DOMContentLoaded", function () {
-        console.log("User ID:", userId);
+
+        async function checkLoginStatus() {
+            const token = localStorage.getItem("accessToken");
+            const buttonContainer = document.getElementById("button-container");
+            const loginBtn = document.getElementById("login-btn");
+            const logoutBtn = document.getElementById("logout-btn");
+            const writeBtn = document.getElementById("write-btn");
+            const notifiContainer = document.getElementById("notification-container");
+
+            if (!token) {
+                loginBtn.style.display = "block";
+                buttonContainer.style.display = "block";
+                return;
+            }
+
+            try {
+                const response = await fetch('/login/user-info', {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                const data = await response.json();
+                if (data.isLoggedIn && data.userId) {
+                    logoutBtn.style.display = "block";
+                    writeBtn.style.display = "block";
+                    notifiContainer.style.display = "block";
+                    connectSSE(data.userId);
+                } else {
+                    loginBtn.style.display = "block";
+                }
+            } catch (error) {
+                console.error('로그인 상태 확인 오류:', error);
+                loginBtn.style.display = "block";
+            } finally {
+                buttonContainer.style.display = "block";
+            }
+        }
+
+        checkLoginStatus();
 
         // ===========================
         // 1) SSE 알림 관련 코드
@@ -173,7 +207,7 @@
         const maxReconnectAttempts = 5; // 최대 5번까지 재연결 시도
         const reconnectInterval = 3000;
 
-        function connectSSE() {
+        function connectSSE(userId) {
             if (!userId) return;
 
             eventSource = new EventSource(`/notifications/subscribe/${userId}`);
@@ -196,7 +230,6 @@
             };
         }
 
-        connectSSE();
 
         // =================================
         // 2) 게시글 검색 & 페이징 기능
@@ -297,6 +330,10 @@
         });
     });
 
+    function logout() {
+        localStorage.removeItem("accessToken");
+        location.reload();
+    }
 </script>
 
 </body>
