@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManager->sessionManager.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login","/post","/").permitAll()
                         .requestMatchers("/post/write","/post/edit/*","/post/*").authenticated()
                         .anyRequest().permitAll())
                 .formLogin(AbstractHttpConfigurer::disable)
