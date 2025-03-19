@@ -3,6 +3,7 @@ package com.hobbyproject.controller.postlike;
 import com.hobbyproject.service.postlike.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -19,12 +20,14 @@ public class PostLikeRestController {
 
     private final PostLikeService postLikeService;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/post/{postId}/like")
     public ResponseEntity<String> upLikeCount(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails) {
         postLikeService.likePost(postId, userDetails.getUsername());
         return ResponseEntity.ok("좋아요를 눌렀습니다.");
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/post/{postId}/like/cancel")
     public ResponseEntity<String> downLikeCount(@PathVariable("postId") Long postId, @AuthenticationPrincipal UserDetails userDetails){
         postLikeService.unlikePost(postId, userDetails.getUsername());

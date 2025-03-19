@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
@@ -42,6 +43,7 @@ public class PostRestController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/post/write")
     public void postWrite(@Valid @RequestParam("images") List<MultipartFile> images,@Valid @ModelAttribute PostWriteDto postWriteDto, BindingResult bindingResult,@AuthenticationPrincipal UserDetails userDetails){
         if (bindingResult.hasErrors()) {
@@ -56,6 +58,7 @@ public class PostRestController {
         return new UrlResource("file:" + uploadFileService.getFullPath(filename));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/post/edit/{postId}")
     public ResponseEntity<String> postEdit(@PathVariable("postId") Long postId, @RequestParam("images") List<MultipartFile> images, @Valid @ModelAttribute PostEditDto postEditDto, BindingResult bindingResult,@AuthenticationPrincipal UserDetails userDetails){
         if (bindingResult.hasErrors()) {
@@ -69,6 +72,7 @@ public class PostRestController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/post/{postId}")
     public ResponseEntity<String> postDelete(@PathVariable("postId") Long postId,@AuthenticationPrincipal UserDetails userDetails){
         if (postService.postDelete(postId, userDetails.getUsername())) {
@@ -79,8 +83,9 @@ public class PostRestController {
     }
 
     @PostMapping("/post/{postId}/count")
-    public void postViewCount(@PathVariable("postId") Long postId, HttpServletRequest req, HttpServletResponse res){
+    public ResponseEntity<String> postViewCount(@PathVariable("postId") Long postId, HttpServletRequest req, HttpServletResponse res){
         viewCountUp(postId, req, res);
+        return ResponseEntity.ok("조회수가 증가 했습니다.");
     }
 
     private void viewCountUp(Long id, HttpServletRequest req, HttpServletResponse res) {
