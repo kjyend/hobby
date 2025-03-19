@@ -49,21 +49,16 @@ public class PostController {
     public String postView(@PathVariable("postId") Long postId,@AuthenticationPrincipal UserDetails userDetails, Model model){
         PostResponseDto post = postService.findPost(postId);
 
-        boolean isLoggedIn = postService.postMemberCheck(postId,userDetails.getUsername());
-        model.addAttribute("isLoggedIn", isLoggedIn);
-
         model.addAttribute("post", post);
         return "post/postview";
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/post/edit/{postId}")
     public String postEdit(@PathVariable("postId") Long postId, Model model){
         model.addAttribute("postId", postId);
         return "post/postedit";
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/post/write")
     public String postWrite(){
         return "/post/postwrite";
