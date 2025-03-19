@@ -29,4 +29,6 @@ public interface PostService {
     Long getViewCount(Long postId);
 
     void incrementViewCount(Long postId);
+
+    boolean isPostOwner(String userId, Long postId);
 }

@@ -133,4 +133,10 @@ public class PostServiceImpl implements PostService {
     public void incrementViewCount(Long postId) {
         postRepository.updateViewCount(postId, getViewCount(postId)+1);
     }
+
+    @Override
+    public boolean isPostOwner(String userId, Long postId) {
+        Post post = postRepository.findById(postId).orElse(null);
+        return post != null && post.getMember().getLoginId().equals(userId);
+    }
 }
