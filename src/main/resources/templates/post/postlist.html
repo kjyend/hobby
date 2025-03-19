@@ -84,7 +84,9 @@
         <button id="logout-btn" class="btn btn-outline-secondary" style="display: none;"
                 onclick="logout()" type="button">로그아웃</button>
         <button id="write-btn" class="btn btn-primary ms-2" style="display: none;"
-                onclick="location.href='/post/write'" type="button">글 작성하기</button>
+                onclick="checkAndRedirectToWrite()" type="button">글 작성하기
+            <input type="hidden" id="Authorization" name="Authorization">
+        </button>
         <button id="login-btn" class="btn btn-success ms-2" style="display: none;"
                 onclick="location.href='/login'" type="button">로그인</button>
     </div>
@@ -143,7 +145,7 @@
             }
 
             try {
-                const response = await fetch('/login/user-info', {
+                const response = await fetch('/login/user/info', {
                     method: 'GET',
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
@@ -167,6 +169,17 @@
 
         checkLoginStatus();
 
+        window.checkAndRedirectToWrite = function ()  {
+            const token = localStorage.getItem("accessToken");
+
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                window.location.href = "/login";
+                return;
+            }
+
+            window.location.href = "/post/write";
+        }
         // ===========================
         // 1) SSE 알림 관련 코드
         // ===========================
@@ -246,32 +259,75 @@
 
         // 게시물 목록 로드 함수
         function loadPosts(page) {
-            let url = `/posts?page=${page}&size=${pageSize}`;
-            if (currentSearchTitle) {
-                url += `&searchTitle=${encodeURIComponent(currentSearchTitle)}`;
-            }
-            fetch(url)
+            fetch(`/posts?page=${page}&size=${pageSize}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("받은 데이터:", data);
                     const postList = document.querySelector('tbody');
-                    postList.innerHTML = '';
+                    postList.innerHTML = ''; // 기존 내용 초기화
+
                     data.posts.forEach(post => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-              <td>${post.postId}</td>
-              <td><a href="/post/${post.postId}" onclick="incrementViewCount(${post.postId})">${post.title}</a></td>
-              <td>${post.name}</td>
-              <td>${formatDate(post.createdDate)}</td>
-              <td>${post.count}</td>
-            `;
+                            <td>${post.postId}</td>
+                            <td><a href="#" data-id="${post.postId}">${post.title}</a></td>
+                            <td>${post.name}</td>
+                            <td>${formatDate(post.createdDate)}</td>
+                            <td>${post.count}</td>
+                        `;
                         postList.appendChild(row);
                     });
                     const totalPages = Math.ceil(data.totalPostCount / pageSize);
                     updatePagination(page, totalPages);
                     currentPage = page;
                 })
-                .catch(error => console.error('Error fetching posts:', error));
+                .catch(error => console.error('게시글 로드 오류:', error));
+        }
+
+        // 게시글 클릭 이벤트 처리
+        document.addEventListener("click", function (event) {
+            if (event.target.matches("td a")) {
+                event.preventDefault();
+
+                const postId = event.target.getAttribute("data-id");
+                const token = localStorage.getItem("accessToken");
+
+                if (!token) {
+                    alert("로그인이 필요합니다.");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                increaseViewCount(postId, token);
+            }
+        });
+        // 조회수 증가 함수
+        function increaseViewCount(postId, token) {
+            fetch(`/post/${postId}/count`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("조회수 증가 실패");
+                    }
+                })
+                .then(() => {
+                    moveToPostPage(postId); // 조회수 증가 성공 시 이동
+                })
+                .catch(error => {
+                    console.error('조회수 증가 오류:', error);
+                    alert("게시글을 불러올 수 없습니다.");
+                });
+        }
+
+        // 페이지 이동 함수
+        function moveToPostPage(postId) {
+            window.location.href = `post/${postId}`;
+
         }
 
         // 페이징 업데이트 함수
@@ -304,30 +360,15 @@
             }
         }
 
-        // 날짜 포맷 함수 (오늘이면 시간, 아니면 날짜)
+        // 날짜 포맷 함수
         function formatDate(createdDate) {
             const today = new Date().toISOString().substring(0, 10);
             const datePart = createdDate.substring(0, 10);
             return datePart === today ? createdDate.substring(11, 16) : datePart;
         }
 
-        // 조회수 증가 함수
-        function incrementViewCount(postId) {
-            fetch(`/post/${postId}/count`, { method: 'POST' })
-                .catch(error => console.error('Error updating view count:', error));
-        }
-
-        // 페이지 로드 시 첫 페이지 호출
+        // 초기 게시글 로드
         loadPosts(1);
-
-        document.addEventListener("click", function (event) {
-            if (event.target.matches("td a")) {
-                event.preventDefault();
-                const postId = event.target.getAttribute("href").split("/").pop();
-                incrementViewCount(postId);
-                window.location.href = event.target.href; // 원래 링크 이동
-            }
-        });
     });
 
     function logout() {

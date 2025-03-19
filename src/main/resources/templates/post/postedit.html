@@ -31,6 +31,7 @@
 
 <script>
     function submitEdit(postId) {
+        const token = localStorage.getItem("accessToken");
         const form = document.getElementById('postEditForm');
         const formData = new FormData(form);
 
@@ -38,6 +39,9 @@
 
         fetch(`/post/edit/${postId}`, {
             method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
             body: formData
         })
             .then(response => {

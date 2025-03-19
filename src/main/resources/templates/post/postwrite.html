@@ -30,12 +30,16 @@
 </div>
 
 <script>
+    const token = localStorage.getItem("accessToken");
     function submitPost() {
         const form = document.getElementById('postWriteForm');
         const formData = new FormData(form);
 
         fetch('/post/write', {
             method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + token
+            },
             body: formData,
         })
             .then(response => {
