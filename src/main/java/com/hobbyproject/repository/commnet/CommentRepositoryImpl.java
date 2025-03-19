@@ -18,10 +18,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
     @Override
     public List<CommentResponseDto> getComment(Long postId) {
         return jpaQueryFactory.select(Projections.fields(CommentResponseDto.class,
-                        comment.commentId,
+                        comment.commentId.as("id"),
                         comment.content,
                         comment.isDeleted,
-                        comment.parent.commentId,
+                        comment.parent.commentId.as("parentId"),
                         member.name,
                         member.loginId
                 ))
