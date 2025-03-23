@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom{
@@ -34,7 +35,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     @Override
     public long postCount() {
-        return jpaQueryFactory.selectFrom(QPost.post).fetch().size();
+        return Optional.ofNullable(
+                jpaQueryFactory.select(QPost.post.count())
+                        .from(QPost.post)
+                        .fetchOne())
+                .orElse(0L);
     }
 
     @Override
