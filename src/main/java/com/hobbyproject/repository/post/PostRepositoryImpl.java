@@ -62,7 +62,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                                 QPost.post.member.name
                         ))
                 .from(QPost.post)
-                .where(QPost.post.title.contains(title))
+                .where(QPost.post.title.like(title+"%"))
                 .limit(Searchdto.getSize())
                 .offset(Searchdto.getOffset())
                 .orderBy(QPost.post.postId.desc())
