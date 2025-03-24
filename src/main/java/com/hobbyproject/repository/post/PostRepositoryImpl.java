@@ -27,7 +27,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         QPost.post.member.name
                         ))
                 .from(QPost.post)
-                .limit(postSearch.getSize())
+                .limit(postSearch.getSize()+1)
                 .offset(postSearch.getOffset())
                 .orderBy(QPost.post.postId.desc())
                 .fetch();
@@ -63,7 +63,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         ))
                 .from(QPost.post)
                 .where(QPost.post.title.like(title+"%"))
-                .limit(Searchdto.getSize())
+                .limit(Searchdto.getSize()+1)
                 .offset(Searchdto.getOffset())
                 .orderBy(QPost.post.postId.desc())
                 .fetch();

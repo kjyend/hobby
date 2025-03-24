@@ -111,16 +111,37 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostPagingResponse getList(SearchDto postSearch) {
         List<PostListDto> posts = postRepository.getList(postSearch);
-        long totalPostCount = postRepository.postCount();
 
-        return new PostPagingResponse(posts, totalPostCount);
+        if(posts.isEmpty()) {
+            long totalPostCount = postRepository.postCount();
+            return new PostPagingResponse(posts, totalPostCount);
+        }
+
+        boolean hasNextPage = posts.size() > postSearch.getSize();
+        if(!hasNextPage){
+            return new PostPagingResponse(posts, posts.size()+postSearch.getOffset());
+        }
+
+        posts.removeLast();
+        return new PostPagingResponse(posts, Math.max(100, posts.size()));
     }
 
     @Override
     public PostPagingResponse getFindTitleList(String title, SearchDto postSearch) {
         List<PostListDto> postTitleContains = postRepository.findPostTitleContains(title, postSearch);
-        long totalPostCount = postTitleContains.size();
-        return new PostPagingResponse(postTitleContains, totalPostCount);
+
+        if(postTitleContains.isEmpty()) {
+            long totalPostCount = postRepository.postCount();
+            return new PostPagingResponse(postTitleContains, totalPostCount);
+        }
+
+        boolean hasNextPage = postTitleContains.size() > postSearch.getSize();
+        if(!hasNextPage){
+            return new PostPagingResponse(postTitleContains, postTitleContains.size()+postSearch.getOffset());
+        }
+
+        postTitleContains.removeLast();
+        return new PostPagingResponse(postTitleContains, Math.max(100, postTitleContains.size()));
     }
 
     @Override
