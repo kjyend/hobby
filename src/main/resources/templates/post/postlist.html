@@ -259,7 +259,14 @@
 
         // 게시물 목록 로드 함수
         function loadPosts(page) {
-            fetch(`/posts?page=${page}&size=${pageSize}`)
+            const url = new URL('/posts', window.location.origin);
+            url.searchParams.append('page', page);
+            url.searchParams.append('size', pageSize);
+            if (currentSearchTitle.trim() !== '') {
+                url.searchParams.append('searchTitle', currentSearchTitle);
+            }
+
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     console.log("받은 데이터:", data);
@@ -269,12 +276,12 @@
                     data.posts.forEach(post => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${post.postId}</td>
-                            <td><a href="#" data-id="${post.postId}">${post.title}</a></td>
-                            <td>${post.name}</td>
-                            <td>${formatDate(post.createdDate)}</td>
-                            <td>${post.count}</td>
-                        `;
+                    <td>${post.postId}</td>
+                    <td><a href="#" data-id="${post.postId}">${post.title}</a></td>
+                    <td>${post.name}</td>
+                    <td>${formatDate(post.createdDate)}</td>
+                    <td>${post.count}</td>
+                `;
                         postList.appendChild(row);
                     });
                     const totalPages = Math.ceil(data.totalPostCount / pageSize);
@@ -283,7 +290,6 @@
                 })
                 .catch(error => console.error('게시글 로드 오류:', error));
         }
-
         // 게시글 클릭 이벤트 처리
         document.addEventListener("click", function (event) {
             if (event.target.matches("td a")) {
