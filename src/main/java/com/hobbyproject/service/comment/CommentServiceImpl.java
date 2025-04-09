@@ -2,6 +2,7 @@ package com.hobbyproject.service.comment;
 
 import com.hobbyproject.dto.comment.request.CreatedComment;
 import com.hobbyproject.dto.comment.response.CommentResponseDto;
+import com.hobbyproject.dto.comment.response.CreateCommentResponse;
 import com.hobbyproject.entity.Comment;
 import com.hobbyproject.entity.DeleteStatus;
 import com.hobbyproject.entity.Member;
@@ -26,7 +27,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void commentCreate(CreatedComment createdComment, Long postId, String loginId) {
+    public CreateCommentResponse commentCreate(CreatedComment createdComment, Long postId, String loginId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
         Member writer = memberRepository.findById(loginId).orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
@@ -43,6 +44,12 @@ public class CommentServiceImpl implements CommentService{
                 .build();
 
         commentRepository.save(comment);
+
+        return CreateCommentResponse.builder()
+                .postOwnerId(post.getMember().getLoginId())
+                .success(true)
+                .content(createdComment.getContent())
+                .build();
     }
 
     @Override
