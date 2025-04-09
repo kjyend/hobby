@@ -132,8 +132,12 @@
             });
     }
 
-    function addComment(postId) {
+    async function addComment(postId) {
         const content = document.getElementById('comment-content').value;
+        if (!content.trim()) {
+            alert("댓글 내용을 입력하세요!");
+            return;
+        }
         const commentData = { content: content };
 
         fetch(`/post/${postId}/comment`, {
@@ -144,21 +148,42 @@
             },
             body: JSON.stringify(commentData),
         })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     alert('댓글이 작성되었습니다.');
                     loadComments(postId);
                     document.getElementById('comment-content').value = '';
+
+                    // 🔔 댓글 작성 시 게시글 작성자에게 알림 전송
+                    sendNotification(postId, data.content ,data.postOwnerId);
                 } else {
-                    return response.json().then(data => {
-                        alert("에러: " + data.map(error => error.defaultMessage).join("\n"));
-                    });
+                    alert("에러: " + data.errors.join("\n"));
                 }
             })
             .catch(error => {
                 console.error('댓글 작성 중 오류가 발생했습니다:', error);
             });
     }
+    // 📩 알림 전송 함수
+    function sendNotification(postId,message, postOwnerId) {
+        const notificationData = {
+            postId: postId,
+            userId: postOwnerId,  // 게시글 작성자의 ID
+            message: `새로운 댓글이 작성되었습니다! "${message}"`
+        };
+        console.log("sendNotification postOwnerId:", postOwnerId);
+
+        fetch("http://localhost:8080/notifications/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(notificationData)
+        })
+            .then(response => response.text())
+            .then(data => console.log("알림 전송 완료:", data))
+            .catch(error => console.error("알림 전송 오류:", error));
+    }
+
 
     window.editPost = function (postId) {
         const token = localStorage.getItem("accessToken");
