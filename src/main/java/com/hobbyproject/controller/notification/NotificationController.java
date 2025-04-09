@@ -1,34 +1,37 @@
 package com.hobbyproject.controller.notification;
 
-import com.hobbyproject.service.sse.SseEmitters;
+import com.hobbyproject.dto.notification.NotificationMessage;
+import com.hobbyproject.rabbitmq.NotificationProducer;
+import com.hobbyproject.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/notifications")
 public class NotificationController {
-    private final SseEmitters sseEmitters;
 
-    @GetMapping("/subscribe/{userId}")
-    public SseEmitter subscribe(@PathVariable("userId") String userId) {
-        SseEmitter emitter = sseEmitters.addEmitter(userId);
+    private final NotificationService notificationService;
+    private final NotificationProducer notificationProducer;
 
-        emitter.onCompletion(() -> {
-            System.out.println("SSE 연결 종료됨: " + userId);
-            sseEmitters.removeEmitter(userId);
-        });
+    @PostMapping("/send")
+    public ResponseEntity<String> sendNotification(@RequestBody NotificationMessage message) {
+        notificationProducer.sendNotification(message); // RabbitMQ로 전송
+        return ResponseEntity.ok("알림이 RabbitMQ를 통해 전송되었습니다.");
+    }
 
-        emitter.onTimeout(() -> {
-            System.out.println("SSE 타임아웃: " + userId);
-            sseEmitters.removeEmitter(userId);
-        });
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<NotificationMessage>> getNotifications(@PathVariable("userId") String userId) {
+        List<NotificationMessage> notifications = notificationService.getUserNotifications(userId);
+        return ResponseEntity.ok(notifications);
+    }
 
-        System.out.println("SSE 구독 성공: " + userId);
-        return emitter;
+    @PatchMapping("/read")
+    public ResponseEntity<Void> markNotificationsAsRead(@RequestBody List<Long> ids) {
+        notificationService.markNotificationsAsRead(ids);
+        return ResponseEntity.ok().build();
     }
 }
