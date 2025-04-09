@@ -47,7 +47,8 @@
         /* --- 알림 드롭다운 스타일 --- */
         #notification-dropdown {
             position: absolute;
-            top: 40px;
+            top: 100%;
+            left: 0;
             right: 0;
             width: 200px;
             background: white;
@@ -55,6 +56,7 @@
             box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
             padding: 10px;
             display: none;
+            z-index: 9999;
         }
         .hidden {
             display: none;
@@ -68,7 +70,7 @@
     <h2 class="text-center mb-4">취미 게시글</h2>
 
     <!-- 알림 아이콘 및 배지 -->
-    <div id="notification-container" style="display: none;">
+    <div id="notification-container" style="position: relative; display: none;">
         <div id="notification-icon">
             <span class="icon">🔔</span>
             <span id="notification-badge" class="badge">0</span>
@@ -191,54 +193,128 @@
         function showNotification(message) {
             badge.style.display = "inline-block";
             badge.textContent = parseInt(badge.textContent || 0) + 1;
+
             const newItem = document.createElement("li");
             newItem.textContent = message;
             notificationList.prepend(newItem);
+
             icon.classList.add("shake");
             icon.addEventListener("animationend", () => {
                 icon.classList.remove("shake");
             }, { once: true });
-            dropdown.classList.remove("hidden");
         }
+
 
         function toggleNotifications() {
-            if (dropdown.classList.contains("hidden")) {
-                // 1️⃣ 알림 드롭다운을 보여줌
-                dropdown.classList.remove("hidden");
+            const dropdownVisible = !dropdown.classList.contains("hidden");
 
-                // 2️⃣ 숫자 초기화 (뱃지 숨김)
+            if (!dropdownVisible) {
+                // 🔽 드롭다운 열기
+                dropdown.classList.remove("hidden");
+                dropdown.style.display = "block";
                 badge.textContent = "";
                 badge.style.display = "none";
+
+                // 🔔 기존 알림 불러오기
+                const token = localStorage.getItem("accessToken");
+                fetch('/login/user/info', {
+                    method: "GET",
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.userId) {
+                            return fetch(`/notifications/${data.userId}`,{
+                                method: "GET",
+                                headers: { 'Authorization': 'Bearer ' + token }
+                            });
+                        }
+                        throw new Error("유저 정보 없음");
+                    })
+                    .then(res => res.json())
+                    .then(notifications => {
+                        notificationList.innerHTML = ""; // 기존 알림 초기화
+
+                        if (notifications.length === 0) {
+                            const li = document.createElement("li");
+                            li.textContent = "새로운 알림이 없습니다.";
+                            notificationList.appendChild(li);
+                            return;
+                        }
+
+                        const unreadIds = [];
+
+                        notifications.forEach(notification => {
+                            const li = document.createElement("li");
+                            li.textContent = notification.message;
+                            notificationList.appendChild(li);
+
+                            // 🔴 안 읽은 알림 ID만 수집
+                            if (!notification.read) {
+                                unreadIds.push(notification.id);
+                            }
+                        });
+
+                        // 🔔 읽음 처리 요청 보내기
+                        if (unreadIds.length > 0) {
+                            const token = localStorage.getItem("accessToken");
+                            fetch("/notifications/read", {
+                                method: "PATCH",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": "Bearer " + token
+                                },
+                                body: JSON.stringify(unreadIds)
+                            })
+                                .then(res => {
+                                    if (!res.ok) throw new Error("읽음 처리 실패");
+                                    console.log("✅ 읽음 처리 완료");
+                                })
+                                .catch(err => console.error("읽음 처리 중 오류:", err));
+                        }
+                    })
             } else {
+                // 🔼 드롭다운 닫기
                 dropdown.classList.add("hidden");
+                dropdown.style.display = "none";
             }
         }
-        icon.addEventListener("click", toggleNotifications);
 
-        let eventSource;
+        icon.addEventListener("click", () => {
+            console.log("🔔 아이콘 클릭됨");
+            toggleNotifications();
+        });
+
+        // SSE 연결 함수
+        let eventSource = null;
         let reconnectAttempts = 0;
-        const maxReconnectAttempts = 5; // 최대 5번까지 재연결 시도
+        const maxReconnectAttempts = 5;
         const reconnectInterval = 3000;
 
         function connectSSE(userId) {
             if (!userId) return;
+            if (eventSource) {
+                console.log("SSE가 이미 연결되어 있습니다.");
+                return;
+            }
 
-            eventSource = new EventSource(`/notifications/subscribe/${userId}`);
+            console.log(`🔔 SSE 연결 시도: /notifications/sse/subscribe/${userId}`);
+            eventSource = new EventSource(`/notifications/sse/subscribe/${userId}`);
 
             eventSource.addEventListener("notification", function (event) {
+                console.log("📩 새로운 알림 수신:", event.data);
                 showNotification(event.data);
-                reconnectAttempts = 0; // 알림을 정상적으로 받으면 재연결 횟수 초기화
+                reconnectAttempts = 0;
             });
 
             eventSource.onerror = function () {
-                console.error("SSE 연결 끊어짐. 재연결 시도 중...");
+                console.error("⚠️ SSE 연결 끊어짐. 재연결 시도 중...");
                 eventSource.close();
-
                 reconnectAttempts++;
                 if (reconnectAttempts <= maxReconnectAttempts) {
-                    setTimeout(connectSSE, reconnectInterval);
+                    setTimeout(() => connectSSE(userId), reconnectInterval);
                 } else {
-                    console.error("SSE 재연결 횟수 초과. 중단.");
+                    console.error("❌ SSE 재연결 횟수 초과. 중단.");
                 }
             };
         }
