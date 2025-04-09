@@ -1,10 +1,8 @@
 package com.hobbyproject.service.postlike;
 
-import com.hobbyproject.dto.notification.NotificationMessage;
 import com.hobbyproject.entity.Member;
 import com.hobbyproject.entity.Post;
 import com.hobbyproject.entity.PostLike;
-import com.hobbyproject.pubsub.RedisPublisher;
 import com.hobbyproject.repository.member.MemberRepository;
 import com.hobbyproject.repository.post.PostRepository;
 import com.hobbyproject.repository.postlike.PostLikeRepository;
@@ -27,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PostLikeServiceImpl implements PostLikeService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final RedisPublisher redisPublisher;
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
     private static final String LIKE_KEY = "post:likes:";
@@ -37,9 +34,6 @@ public class PostLikeServiceImpl implements PostLikeService {
     @Transactional
     public void likePost(Long postId, String memberName) {
         redisTemplate.opsForSet().add(LIKE_KEY + postId, memberName);
-        String postOwner = getPostOwner(postId);
-        String name = getMemberName(memberName);
-        redisPublisher.publish("notifications",new NotificationMessage(postOwner,"유저 "+name+"가 당신의 post에 좋아요를 눌렀습니다."));
     }
 
     private String getMemberName(String memberName) {
