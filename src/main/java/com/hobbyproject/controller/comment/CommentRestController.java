@@ -2,6 +2,7 @@ package com.hobbyproject.controller.comment;
 
 import com.hobbyproject.dto.comment.request.CreatedComment;
 import com.hobbyproject.dto.comment.response.CommentResponseDto;
+import com.hobbyproject.dto.comment.response.CreateCommentResponse;
 import com.hobbyproject.service.comment.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +22,15 @@ public class CommentRestController {
 
 
     @GetMapping("/post/{postId}/comment")
-    public List<CommentResponseDto> getCommentList(@PathVariable("postId") Long postId){
-        return commentService.getList(postId);
+    public ResponseEntity<List<CommentResponseDto>> getCommentList(@PathVariable("postId") Long postId){
+        return ResponseEntity.ok(commentService.getList(postId));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/post/{postId}/comment")
-    public void addComment(@PathVariable("postId") Long postId, @Valid @RequestBody CreatedComment createdComment,@AuthenticationPrincipal UserDetails userDetails){
-        commentService.commentCreate(createdComment, postId, userDetails.getUsername());
+    public ResponseEntity<CreateCommentResponse> addComment(@PathVariable("postId") Long postId, @Valid @RequestBody CreatedComment createdComment,@AuthenticationPrincipal UserDetails userDetails){
+        CreateCommentResponse response = commentService.commentCreate(createdComment, postId, userDetails.getUsername());
+        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
