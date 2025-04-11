@@ -16,15 +16,13 @@ public class NotificationLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long postId;
     private String userId;
     private String message;
     private LocalDateTime createdAt;
     @Column(name = "is_read")
     private boolean read = false;
 
-    public NotificationLog(Long postId, String userId, String message, LocalDateTime createdAt) {
-        this.postId = postId;
+    public NotificationLog(String userId, String message, LocalDateTime createdAt) {
         this.userId = userId;
         this.message = message;
         this.createdAt = createdAt;
@@ -35,9 +33,6 @@ public class NotificationLog {
         return id;
     }
 
-    public Long getPostId() {
-        return postId;
-    }
 
     public String getUserId() {
         return userId;

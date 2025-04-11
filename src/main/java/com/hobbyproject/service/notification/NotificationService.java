@@ -19,7 +19,6 @@ public class NotificationService {
 
     public void saveNotification(NotificationMessage message) {
         NotificationLog log = new NotificationLog(
-                message.getPostId(),
                 message.getUserId(),
                 message.getMessage(),
                 LocalDateTime.now()
@@ -33,7 +32,6 @@ public class NotificationService {
         return logs.stream()
                 .map(log -> new NotificationMessage(
                         log.getId(),
-                        log.getPostId(),
                         log.getUserId(),
                         log.getMessage(),
                         log.getCreatedAt(),

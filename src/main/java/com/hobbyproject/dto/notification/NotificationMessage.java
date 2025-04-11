@@ -10,7 +10,6 @@ public class NotificationMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-    private Long postId;
     private String userId;
     private String message;
     private LocalDateTime createdAt;
@@ -19,9 +18,8 @@ public class NotificationMessage implements Serializable {
     public NotificationMessage() {
     }
 
-    public NotificationMessage(Long id, Long postId, String userId, String message, LocalDateTime createdAt, boolean read) {
+    public NotificationMessage(Long id, String userId, String message, LocalDateTime createdAt, boolean read) {
         this.id = id;
-        this.postId = postId;
         this.userId = userId;
         this.message = message;
         this.createdAt = createdAt;
