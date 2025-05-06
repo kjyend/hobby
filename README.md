@@ -9,6 +9,8 @@
 | 취미 기록 게시판 V3       | [취미 Web Page V3](https://github.com/kjyend/hobbyprojectV3) |
 | 취미 기록 게시판 V4       | [취미 Web Page V4](https://github.com/kjyend/hobbyprojectV4) |
 | 취미 기록 게시판 V5       | [취미 Web Page V5](https://github.com/kjyend/hobbyprojectV5) |
+| 취미 기록 게시판 V6       | [취미 Web Page V6](https://github.com/kjyend/hobbyprojectV6) |
+
 
 ## 개요
 
