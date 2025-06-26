@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>취미 게시글</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* --- 검색창 스타일 --- */
+        #searchTitle {
+            border: 2px solid #007bff;
+            border-radius: 20px;
+            padding: 8px 15px;
+            outline: none;
+            margin-right: 5px;
+        }
+        .btn-outline-primary {
+            border-radius: 10px;
+        }
+        /* --- 알림 아이콘 흔들리는 애니메이션 --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+        #notification-icon.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        #notification-icon {
+            position: relative;
+            display: inline-block;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            font-size: 12px;
+            padding: 4px 6px;
+            border-radius: 50%;
+            display: none;
+        }
+        /* --- 알림 드롭다운 스타일 --- */
+        #notification-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            width: 200px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+            display: none;
+            z-index: 9999;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <!-- 제목 -->
+    <h2 class="text-center mb-4">취미 게시글</h2>
+
+    <!-- 알림 아이콘 및 배지 -->
+    <div id="notification-container" style="position: relative; display: none;">
+        <div id="notification-icon">
+            <span class="icon">🔔</span>
+            <span id="notification-badge" class="badge">0</span>
+        </div>
+        <!-- 알림 드롭다운 -->
+        <div id="notification-dropdown" class="hidden">
+            <ul id="notification-list"></ul>
+        </div>
+    </div>
+
+    <!-- 로그인/글작성/로그아웃 버튼 -->
+    <div class="d-flex justify-content-end mb-3" id="button-container" style="display: none;">
+        <button id="logout-btn" class="btn btn-outline-secondary" style="display: none;"
+                onclick="logout()" type="button">로그아웃</button>
+        <button id="write-btn" class="btn btn-primary ms-2" style="display: none;"
+                onclick="checkAndRedirectToWrite()" type="button">글 작성하기
+            <input type="hidden" id="Authorization" name="Authorization">
+        </button>
+        <button id="login-btn" class="btn btn-success ms-2" style="display: none;"
+                onclick="location.href='/login'" type="button">로그인</button>
+    </div>
+    <!-- 검색 폼 -->
+    <div class="d-flex justify-content-end mb-3">
+        <form id="searchForm" class="d-flex">
+            <input type="text" id="searchTitle" placeholder="제목 검색">
+            <button type="submit" class="btn btn-outline-primary">검색</button>
+        </form>
+    </div>
+
+    <!-- 게시물 테이블 -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered text-center">
+            <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+                <th>조회수</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 게시물은 JavaScript로 동적으로 로드됩니다 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 페이징 영역 -->
+    <div class="d-flex justify-content-center mt-3">
+        <nav>
+            <ul class="pagination" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<!-- 스크립트 영역 -->
+<script th:inline="javascript">
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        async function checkLoginStatus() {
+            const token = localStorage.getItem("accessToken");
+            const buttonContainer = document.getElementById("button-container");
+            const loginBtn = document.getElementById("login-btn");
+            const logoutBtn = document.getElementById("logout-btn");
+            const writeBtn = document.getElementById("write-btn");
+            const notifiContainer = document.getElementById("notification-container");
+
+            if (!token) {
+                loginBtn.style.display = "block";
+                buttonContainer.style.display = "block";
+                return;
+            }
+
+            try {
+                const response = await fetch('/login/user/info', {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                const data = await response.json();
+                if (data.isLoggedIn && data.userId) {
+                    logoutBtn.style.display = "block";
+                    writeBtn.style.display = "block";
+                    notifiContainer.style.display = "block";
+                    connectSSE(data.userId);
+                } else {
+                    loginBtn.style.display = "block";
+                }
+            } catch (error) {
+                console.error('로그인 상태 확인 오류:', error);
+                loginBtn.style.display = "block";
+            } finally {
+                buttonContainer.style.display = "block";
+            }
+        }
+
+        checkLoginStatus();
+
+        window.checkAndRedirectToWrite = function ()  {
+            const token = localStorage.getItem("accessToken");
+
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                window.location.href = "/login";
+                return;
+            }
+
+            window.location.href = "/post/write";
+        }
+        // ===========================
+        // 1) SSE 알림 관련 코드
+        // ===========================
+        const icon = document.getElementById("notification-icon");
+        const badge = document.getElementById("notification-badge");
+        const dropdown = document.getElementById("notification-dropdown");
+        const notificationList = document.getElementById("notification-list");
+
+        function showNotification(message) {
+            badge.style.display = "inline-block";
+            badge.textContent = parseInt(badge.textContent || 0) + 1;
+
+            const newItem = document.createElement("li");
+            newItem.textContent = message;
+            notificationList.prepend(newItem);
+
+            icon.classList.add("shake");
+            icon.addEventListener("animationend", () => {
+                icon.classList.remove("shake");
+            }, { once: true });
+        }
+
+
+        function toggleNotifications() {
+            const dropdownVisible = !dropdown.classList.contains("hidden");
+
+            if (!dropdownVisible) {
+                // 🔽 드롭다운 열기
+                dropdown.classList.remove("hidden");
+                dropdown.style.display = "block";
+                badge.textContent = "";
+                badge.style.display = "none";
+
+                // 🔔 기존 알림 불러오기
+                const token = localStorage.getItem("accessToken");
+                fetch('/login/user/info', {
+                    method: "GET",
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.userId) {
+                            return fetch(`/notifications/${data.userId}`,{
+                                method: "GET",
+                                headers: { 'Authorization': 'Bearer ' + token }
+                            });
+                        }
+                        throw new Error("유저 정보 없음");
+                    })
+                    .then(res => res.json())
+                    .then(notifications => {
+                        notificationList.innerHTML = ""; // 기존 알림 초기화
+
+                        if (notifications.length === 0) {
+                            const li = document.createElement("li");
+                            li.textContent = "새로운 알림이 없습니다.";
+                            notificationList.appendChild(li);
+                            return;
+                        }
+
+                        const unreadIds = [];
+
+                        notifications.forEach(notification => {
+                            const li = document.createElement("li");
+                            li.textContent = notification.message;
+                            notificationList.appendChild(li);
+
+                            // 🔴 안 읽은 알림 ID만 수집
+                            if (!notification.read) {
+                                unreadIds.push(notification.id);
+                            }
+                        });
+
+                        // 🔔 읽음 처리 요청 보내기
+                        if (unreadIds.length > 0) {
+                            const token = localStorage.getItem("accessToken");
+                            fetch("/notifications/read", {
+                                method: "PATCH",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": "Bearer " + token
+                                },
+                                body: JSON.stringify(unreadIds)
+                            })
+                                .then(res => {
+                                    if (!res.ok) throw new Error("읽음 처리 실패");
+                                    console.log("✅ 읽음 처리 완료");
+                                })
+                                .catch(err => console.error("읽음 처리 중 오류:", err));
+                        }
+                    })
+            } else {
+                // 🔼 드롭다운 닫기
+                dropdown.classList.add("hidden");
+                dropdown.style.display = "none";
+            }
+        }
+
+        icon.addEventListener("click", () => {
+            console.log("🔔 아이콘 클릭됨");
+            toggleNotifications();
+        });
+
+        // SSE 연결 함수
+        let eventSource = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        const reconnectInterval = 3000;
+
+        function connectSSE(userId) {
+            if (!userId) return;
+            if (eventSource) {
+                console.log("SSE가 이미 연결되어 있습니다.");
+                return;
+            }
+
+            console.log(`🔔 SSE 연결 시도: /notifications/sse/subscribe/${userId}`);
+            eventSource = new EventSource(`/notifications/sse/subscribe/${userId}`);
+
+            eventSource.addEventListener("notification", function (event) {
+                console.log("📩 새로운 알림 수신:", event.data);
+                showNotification(event.data);
+                reconnectAttempts = 0;
+            });
+
+            eventSource.onerror = function () {
+                console.error("⚠️ SSE 연결 끊어짐. 재연결 시도 중...");
+                eventSource.close();
+                reconnectAttempts++;
+                if (reconnectAttempts <= maxReconnectAttempts) {
+                    setTimeout(() => connectSSE(userId), reconnectInterval);
+                } else {
+                    console.error("❌ SSE 재연결 횟수 초과. 중단.");
+                }
+            };
+        }
+
+
+        // =================================
+        // 2) 게시글 검색 & 페이징 기능
+        // =================================
+        let currentPage = 1;
+        const pageSize = 10;
+        let currentSearchTitle = "";
+
+        document.getElementById('searchForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            currentSearchTitle = document.getElementById('searchTitle').value;
+            loadPosts(1);
+        });
+
+        // 게시물 목록 로드 함수
+        function loadPosts(page) {
+            const url = new URL('/posts', window.location.origin);
+            url.searchParams.append('page', page);
+            url.searchParams.append('size', pageSize);
+            if (currentSearchTitle.trim() !== '') {
+                url.searchParams.append('searchTitle', currentSearchTitle);
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("받은 데이터:", data);
+                    const postList = document.querySelector('tbody');
+                    postList.innerHTML = ''; // 기존 내용 초기화
+
+                    data.posts.forEach(post => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                    <td>${post.postId}</td>
+                    <td><a href="#" data-id="${post.postId}">${post.title}</a></td>
+                    <td>${post.name}</td>
+                    <td>${formatDate(post.createdDate)}</td>
+                    <td>${post.count}</td>
+                `;
+                        postList.appendChild(row);
+                    });
+                    const totalPages = Math.ceil(data.totalPostCount / pageSize);
+                    updatePagination(page, totalPages);
+                    currentPage = page;
+                })
+                .catch(error => console.error('게시글 로드 오류:', error));
+        }
+        // 게시글 클릭 이벤트 처리
+        document.addEventListener("click", function (event) {
+            if (event.target.matches("td a")) {
+                event.preventDefault();
+
+                const postId = event.target.getAttribute("data-id");
+                const token = localStorage.getItem("accessToken");
+
+                if (!token) {
+                    alert("로그인이 필요합니다.");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                increaseViewCount(postId, token);
+            }
+        });
+        // 조회수 증가 함수
+        function increaseViewCount(postId, token) {
+            fetch(`/post/${postId}/count`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("조회수 증가 실패");
+                    }
+                })
+                .then(() => {
+                    moveToPostPage(postId); // 조회수 증가 성공 시 이동
+                })
+                .catch(error => {
+                    console.error('조회수 증가 오류:', error);
+                    alert("게시글을 불러올 수 없습니다.");
+                });
+        }
+
+        // 페이지 이동 함수
+        function moveToPostPage(postId) {
+            window.location.href = `post/${postId}`;
+
+        }
+
+        // 페이징 업데이트 함수
+        function updatePagination(current, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            // 페이지가 없으면 표시하지 않음
+            if (totalPages < 1) {
+                return;
+            }
+
+            const maxPagesToShow = 10;
+            let pageRangeStart = Math.floor((current - 1) / maxPagesToShow) * maxPagesToShow + 1;
+            let pageRangeEnd = Math.min(pageRangeStart + maxPagesToShow - 1, totalPages);
+
+            for (let i = pageRangeStart; i <= pageRangeEnd; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (i === current ? ' active' : '');
+                const a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = i;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    loadPosts(i);
+                });
+                li.appendChild(a);
+                pagination.appendChild(li);
+            }
+        }
+
+        // 날짜 포맷 함수
+        function formatDate(createdDate) {
+            const today = new Date().toISOString().substring(0, 10);
+            const datePart = createdDate.substring(0, 10);
+            return datePart === today ? createdDate.substring(11, 16) : datePart;
+        }
+
+        // 초기 게시글 로드
+        loadPosts(1);
+    });
+
+    function logout() {
+        localStorage.removeItem("accessToken");
+        location.reload();
+    }
+</script>
+
+</body>
+</html>

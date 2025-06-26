@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Post View</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="mt-3">
+        <button class="btn btn-secondary" type="button"
+                onclick="location.href='home.html'"
+                th:onclick="|location.href='@{/post}'|">홈 화면으로</button>
+    </div>
+
+    <h2 th:text="${post.title}">제목</h2>
+    작성자: <span th:text="${post.name}">작성자</span>
+    <p th:text="${post.content}">내용</p>
+
+
+    <div class="image-container mt-4" th:if="${#lists.size(post.imageUrls) > 0}">
+        <h4>Images:</h4>
+        <div class="d-flex">
+            <div th:each="imageUrl : ${post.imageUrls}">
+                <img th:src="|/images/${imageUrl}|" class="img-thumbnail" style="max-width: 200px; margin-right: 10px;" alt="Image"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button id="edit-btn" class="btn btn-primary" th:onclick="'editPost(' + ${post.id} + ');'">수정하기</button>
+        <button id="delete-btn" class="btn btn-danger" th:onclick="'deletePost('+${post.id}+')'">삭제하기</button>
+    </div>
+
+    <div class="like-container mt-4">
+        <button id="like-button" class="btn btn-outline-primary">
+            좋아요 <span id="like-count" th:text="${post.likeCount}"/>
+        </button>
+    </div>
+
+    <h3>댓글</h3>
+
+    <div class="comment-container mt-4">
+        <textarea id="comment-content" class="form-control" placeholder="댓글을 입력하세요" rows="3"></textarea>
+        <button class="btn btn-success mt-2" type="button"
+                th:onclick="'addComment(' + ${post.id} + ');'">댓글 작성</button>
+    </div>
+
+    <div id="comment-list" class="mt-5"></div>
+
+</div>
+
+<script th:inline="javascript">
+    const token = localStorage.getItem("accessToken");
+    let currentUserLoginId = [[${#authentication.name}]];  // 로그인한 사용자
+
+    let liked = false;
+    let isProcessing = false;
+
+    async function checkLoginStatus(postId) {
+        const token = localStorage.getItem("accessToken");
+        const editBtn = document.getElementById("edit-btn");
+        const deleteBtn = document.getElementById("delete-btn");
+
+        if (!token) {
+            editBtn.style.display = "none";
+            deleteBtn.style.display = "none";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/login/user/check?postId=${postId}`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            const data = await response.json();
+            console.log("서버 응답:", data); // 응답 데이터 확인
+
+            if (data.isLoggedIn) {
+                currentUserLoginId = data.userId; // 로그인한 사용자 ID 설정
+                if (data.isPostOwner) {
+                    editBtn.style.display = "block";
+                    deleteBtn.style.display = "block";
+                    loadComments(postId)
+                } else {
+                    editBtn.style.display = "none";
+                    deleteBtn.style.display = "none";
+                }
+            }
+        } catch (error) {
+            console.error('로그인 상태 확인 오류:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const postId = [[${post.id}]];
+        checkLoginStatus(postId);
+    });
+
+
+    function loadComments(postId) {
+        fetch(`/post/${postId}/comment`)
+            .then(response => response.json())
+            .then(data => {
+                const commentList = document.getElementById('comment-list');
+                commentList.innerHTML = '';  // 기존 댓글 삭제
+
+                data.forEach(comment => {
+                    const commentElement = document.createElement('div');
+                    commentElement.classList.add('border', 'p-2', 'mb-2', 'rounded', 'comment-container');
+                    console.log("댓글 ID:", comment.id, "작성자:", comment.name);  // 콘솔 확인
+
+
+                    if (comment.isDeleted === 'YES') {
+                        commentElement.innerHTML = `<p><em>삭제된 댓글입니다.</em></p>`;
+                    } else {
+                        commentElement.innerHTML = `<p>${comment.name}: ${comment.content}</p>`;
+
+                        if (comment.loginId === currentUserLoginId) {
+                            commentElement.innerHTML += `
+                            <button class="btn btn-danger btn-sm" onclick="deleteComment(${postId}, ${comment.id})">댓글 삭제</button>
+                        `;
+                        }
+                    }
+
+                    commentList.appendChild(commentElement);
+                });
+            })
+            .catch(error => {
+                console.error('댓글을 불러오는 중 오류가 발생했습니다:', error);
+            });
+    }
+
+    async function addComment(postId) {
+        const content = document.getElementById('comment-content').value;
+        if (!content.trim()) {
+            alert("댓글 내용을 입력하세요!");
+            return;
+        }
+        const commentData = { content: content };
+
+        fetch(`/post/${postId}/comment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(commentData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('댓글이 작성되었습니다.');
+                    loadComments(postId);
+                    document.getElementById('comment-content').value = '';
+
+                    // 🔔 댓글 작성 시 게시글 작성자에게 알림 전송
+                    sendNotification(postId, data.content ,data.postOwnerId);
+                } else {
+                    alert("에러: " + data.errors.join("\n"));
+                }
+            })
+            .catch(error => {
+                console.error('댓글 작성 중 오류가 발생했습니다:', error);
+            });
+    }
+    // 📩 알림 전송 함수
+    function sendNotification(postId,message, postOwnerId) {
+        const notificationData = {
+            postId: postId,
+            userId: postOwnerId,  // 게시글 작성자의 ID
+            message: `새로운 댓글이 작성되었습니다! "${message}"`
+        };
+        console.log("sendNotification postOwnerId:", postOwnerId);
+
+        fetch("http://localhost:8080/notifications/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(notificationData)
+        })
+            .then(response => response.text())
+            .then(data => console.log("알림 전송 완료:", data))
+            .catch(error => console.error("알림 전송 오류:", error));
+    }
+
+
+    window.editPost = function (postId) {
+        const token = localStorage.getItem("accessToken");
+
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            window.location.href = "/login";
+            return;
+        }
+
+        console.log(`게시글 수정 페이지 이동: /post/edit/${postId}`);
+        window.location.href = `/post/edit/${postId}`;
+    };
+
+    function deleteComment(postId, commentId) {
+        fetch(`/post/${postId}/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {'Authorization': 'Bearer ' + token }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('댓글이 삭제되었습니다.');
+                    loadComments(postId);
+                } else {
+                    return response.json().then(data => {
+                        alert("에러: " + data.map(error => error.defaultMessage).join("\n"));
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('댓글 삭제 중 오류가 발생했습니다:', error);
+            });
+    }
+
+    window.deletePost=function (postId) {
+        fetch(`/post/${postId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('게시글이 삭제되었습니다.');
+                    window.location.href = '/post';
+                } else {
+                    return response.json().then(data => {
+                        alert("에러: " + data.map(error => error.defaultMessage).join("\n"));
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('게시글 삭제 중 오류가 발생했습니다:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const postId = [[${post.id}]];
+
+        loadComments(postId);
+
+        fetch(`/post/${postId}/like/status`)
+            .then(response => response.json())
+            .then(data => {
+                liked = data.liked;
+                updateLikeUI(postId);
+            });
+
+        document.getElementById('like-button').addEventListener('click', function (event) {
+            event.stopPropagation();  // 부모 요소로 이벤트가 전달되지 않도록 막음
+            toggleLike(postId);
+        });
+    });
+
+    function toggleLike(postId) {
+        if (isProcessing) return;
+        isProcessing = true;
+
+        const url = liked ? `/post/${postId}/like/cancel` : `/post/${postId}/like`;
+        const method = 'POST';
+
+        fetch(url, { method , headers: { 'Authorization': 'Bearer ' + token } })
+            .then(response => {
+                if (response.ok) {
+                    liked = !liked;
+                    updateLikeUI(postId);
+                } else {
+                    alert('좋아요 상태 변경 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => console.error('좋아요 상태 변경 중 오류:', error))
+            .finally(() => {
+                isProcessing = false;
+            });
+    }
+
+
+    function updateLikeUI(postId) {
+        const likeButton = document.getElementById('like-button');
+        const likeCountElement = likeButton.querySelector('span');
+
+        fetch(`/post/${postId}/like/count`,{method: 'GET',headers: { 'Authorization': 'Bearer ' + token }})
+            .then(response => response.json())
+            .then(data => {
+                likeCountElement.textContent = data.count;  // span 태그 내부 값만 변경
+            });
+
+        if (liked) {
+            likeButton.classList.remove('btn-outline-primary');
+            likeButton.classList.add('btn-primary');
+        } else {
+            likeButton.classList.remove('btn-primary');
+            likeButton.classList.add('btn-outline-primary');
+        }
+    }
+</script>
+
+</body>
+</html>
