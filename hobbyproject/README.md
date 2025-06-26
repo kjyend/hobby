@@ -4,12 +4,12 @@
 
 | **버전** | **링크**       |
 |----------|----------------|
-| 취미 기록 게시판 V1       | [취미 Web Page V1](https://github.com/kjyend/hobbyproject) |
-| 취미 기록 게시판 V2       | [취미 Web Page V2](https://github.com/kjyend/hobbyprojectV2) |
-| 취미 기록 게시판 V3       | [취미 Web Page V3](https://github.com/kjyend/hobbyprojectV3) |
-| 취미 기록 게시판 V4       | [취미 Web Page V4](https://github.com/kjyend/hobbyprojectV4) |
-| 취미 기록 게시판 V5       | [취미 Web Page V5](https://github.com/kjyend/hobbyprojectV5) |
-| 취미 기록 게시판 V6       | [취미 Web Page V6](https://github.com/kjyend/hobbyprojectV6) |
+| 취미 기록 게시판 V1       | [취미 Web Page V1](https://github.com/kjyend/hobby/tree/main/hobbyproject) |
+| 취미 기록 게시판 V2       | [취미 Web Page V2](https://github.com/kjyend/hobby/tree/main/hobbyprojectV2) |
+| 취미 기록 게시판 V3       | [취미 Web Page V3](https://github.com/kjyend/hobby/tree/main/hobbyprojectV3) |
+| 취미 기록 게시판 V4       | [취미 Web Page V4](https://github.com/kjyend/hobby/tree/main/hobbyprojectV4) |
+| 취미 기록 게시판 V5       | [취미 Web Page V5](https://github.com/kjyend/hobby/tree/main/hobbyprojectV5) |
+| 취미 기록 게시판 V6       | [취미 Web Page V6](https://github.com/kjyend/hobby/tree/main/hobbyprojectV6) |
 
 
 ## 개요
@@ -49,24 +49,29 @@ Environment : IntelliJ, Git, GitHub
 
 ## 화면 구성
 메인 화면
-![스크린샷_7-9-2024_212015_localhost](https://github.com/user-attachments/assets/96433d05-eace-4391-bb89-4915c519e9c4)
+![스크린샷_7-9-2024_212015_localhost](https://github.com/user-attachments/assets/aec39d23-443e-4478-abc8-4cf7b0cbf2ec)
+
 
 회원가입 화면
-![스크린샷_7-9-2024_212146_localhost](https://github.com/user-attachments/assets/8941c4f8-8cea-42d3-bb0f-979b39b50fb9)
+![스크린샷_7-9-2024_212146_localhost](https://github.com/user-attachments/assets/d2a8784f-8e41-47d6-b363-d5d446a71b35)
+
 
 로그인 화면
-![스크린샷_7-9-2024_212125_localhost](https://github.com/user-attachments/assets/05a029ff-1651-47fb-be41-242513ca4150)
+![스크린샷_7-9-2024_212125_localhost](https://github.com/user-attachments/assets/4e1b87af-ff38-499a-822e-1f39fa7c6092)
+
 
 게시글 화면
-![스크린샷_7-9-2024_21264_localhost](https://github.com/user-attachments/assets/a89325fa-75ea-45b5-aebf-e3ed40cc2c6e)
+![스크린샷_7-9-2024_21264_localhost](https://github.com/user-attachments/assets/2efcebe8-15a0-4494-acc7-4327d95dbbe6)
+
 
 게시글 작성 화면
-![스크린샷_7-9-2024_212514_localhost](https://github.com/user-attachments/assets/3a607aa9-5870-4bca-87b6-aa38b991ce74)
+![스크린샷_7-9-2024_212514_localhost](https://github.com/user-attachments/assets/77bb8f11-2118-4fe8-aaaa-9fee00117e1b)
+
 
 게시글 수정 화면
-![스크린샷_7-9-2024_22314_localhost](https://github.com/user-attachments/assets/800c7754-5a7a-4a43-aef9-fd6e4c0963c7)
+![스크린샷_7-9-2024_22314_localhost](https://github.com/user-attachments/assets/366b01ad-fdd1-4d7a-8c9a-e7ac4468a25e)
 
 
 ## ERD
-![스크린샷 2024-09-09 161555](https://github.com/user-attachments/assets/9898b6a6-d1ea-4a0b-9bb1-ed6905c7f444)
+![스크린샷 2024-09-09 161555](https://github.com/user-attachments/assets/08bed8bd-af9d-4718-851c-a7adcfd93d52)
 
