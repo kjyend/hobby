@@ -1,0 +1,111 @@
+package com.hobbyproject.repository.post;
+
+
+import com.hobbyproject.config.QueryDslConfig;
+import com.hobbyproject.dto.post.request.SearchDto;
+import com.hobbyproject.dto.post.response.PostListDto;
+import com.hobbyproject.entity.Member;
+import com.hobbyproject.entity.Post;
+import com.hobbyproject.repository.member.MemberRepository;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@Import(QueryDslConfig.class)
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class PostRepositoryTest {
+
+    @Autowired
+    private PostRepository postRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @BeforeAll
+    void setUp() {
+        int batchSize = 1000; // 한 번에 처리할 데이터 크기
+        List<Post> posts = new ArrayList<>();
+
+        Member member = memberRepository.save(Member.builder().loginId("1234").build());
+
+        for (long i = 1L; i <= 10_000L; i++) {
+            Post post = Post.builder()
+                    .postId(i)
+                    .content(i + "내용입니다.")
+                    .title(i + "제목입니다.")
+                    .member(member)
+                    .build();
+            posts.add(post);
+
+            if (posts.size() == batchSize) {
+                postRepository.saveAll(posts);
+                posts.clear();
+            }
+        }
+
+        if (!posts.isEmpty()) {
+            postRepository.saveAll(posts);
+        }
+    }
+
+    @AfterAll
+    void tearDown() {
+        postRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("게시글 조회")
+    void testFindById() {
+        Post post = postRepository.findById(1L).orElseThrow();
+        assertEquals("1제목입니다.", post.getTitle());
+    }
+
+    @Test
+    @DisplayName("게시글을 만들고 방문 횟수 0회 확인")
+    void testFindCountByPostId() {
+        Long count = postRepository.findCountByPostId(10L);
+        assertEquals(0L, count, "Initial count should be 0");
+    }
+
+    @Test
+    @DisplayName("게시글을 만들고 좋아요 횟수 0회 확인")
+    void testFindLikeCountByPostId() {
+        Long likeCount = postRepository.findLikeCountByPostId(1L);
+        assertEquals(0L, likeCount, "Initial like count should be 0");
+    }
+
+    @Test
+    @DisplayName("게시글 조회수 500회 설정하고 조회수 확인")
+    void testUpdateViewCount() {
+        Long postId = 1L;
+        Long updatedCount = 500L;
+
+        postRepository.updateViewCount(postId, updatedCount);
+
+        Post updatedPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        assertEquals(updatedCount, updatedPost.getCount(), "Updated count should match");
+    }
+
+    @Test
+    @DisplayName("게시글 페이징 조회")
+    void testGetList() {
+        SearchDto searchDto = new SearchDto(19, 500);
+
+        long startTime = System.currentTimeMillis();
+        List<PostListDto> posts = postRepository.getList(searchDto);
+        long endTime = System.currentTimeMillis();
+
+        assertEquals(500, posts.size());
+        System.out.println("조회 시간(ms): " + (endTime - startTime)+"ms");
+
+    }
+}
