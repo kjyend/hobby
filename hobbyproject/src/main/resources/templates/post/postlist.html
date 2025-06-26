@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>취미 게시글</title>
+    <style>
+        .button-container button {
+            display: inline-block;
+            margin-right: 10px; /* 버튼 사이에 여백 추가 */
+            float: right;
+        }
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .header span {
+            margin: 0 15px;
+        }
+        .table-container {
+            margin-top: 30px;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div style="text-align: center; margin-top: 100px;">
+        <h2>취미 게시글</h2>
+        <div class="button-container">
+            <button th:if="${isLoggedIn}" onclick="logout()">로그아웃</button>
+            <button th:if="${isLoggedIn}" onclick="location.href='postlist.html'"
+                    th:onclick="|location.href='@{/post/write}'|"
+                    type="button">글 작성하기</button>
+            <button th:if="${!isLoggedIn}" onclick="location.href='login.html'"
+                    th:onclick="|location.href='@{/login}'|"
+                    type="button">로그인</button>
+
+        </div>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>제목</th>
+                <th>작성자</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="post:${posts}" th:action="@{/post/{postId}(postId=${post.postId})}" class="get">
+                <td th:text="${post.postId}"></td>
+                <td>
+                    <a th:href="@{/post/{postId}(postId=${post.postId})}" th:text="${post.title}"></a>
+                </td>
+                <td th:text="${post.content}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    function logout() {
+        fetch('/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/post';
+                } else {
+                    alert("로그아웃 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            });
+    }
+</script>
+</body>
+</html>
