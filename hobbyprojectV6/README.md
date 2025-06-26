@@ -9,12 +9,12 @@ V6에서는 **JWT 기반 로그인 전환, 페이징 및 검색 쿼리 최적화
 
 | **버전** | **링크**       |
 |----------|----------------|
-| 취미 기록 게시판 V1       | [취미 Web Page V1](https://github.com/kjyend/hobbyproject) |
-| 취미 기록 게시판 V2       | [취미 Web Page V2](https://github.com/kjyend/hobbyprojectV2) |
-| 취미 기록 게시판 V3       | [취미 Web Page V3](https://github.com/kjyend/hobbyprojectV3) |
-| 취미 기록 게시판 V4       | [취미 Web Page V4](https://github.com/kjyend/hobbyprojectV4) |
-| 취미 기록 게시판 V5       | [취미 Web Page V5](https://github.com/kjyend/hobbyprojectV5) |
-| 취미 기록 게시판 V6       | [취미 Web Page V6](https://github.com/kjyend/hobbyprojectV6) |
+| 취미 기록 게시판 V1       | [취미 Web Page V1](https://github.com/kjyend/hobby/tree/main/hobbyproject) |
+| 취미 기록 게시판 V2       | [취미 Web Page V2](https://github.com/kjyend/hobby/tree/main/hobbyprojectV2) |
+| 취미 기록 게시판 V3       | [취미 Web Page V3](https://github.com/kjyend/hobby/tree/main/hobbyprojectV3) |
+| 취미 기록 게시판 V4       | [취미 Web Page V4](https://github.com/kjyend/hobby/tree/main/hobbyprojectV4) |
+| 취미 기록 게시판 V5       | [취미 Web Page V5](https://github.com/kjyend/hobby/tree/main/hobbyprojectV5) |
+| 취미 기록 게시판 V6       | [취미 Web Page V6](https://github.com/kjyend/hobby/tree/main/hobbyprojectV6) |
 
 ## 개요
 
