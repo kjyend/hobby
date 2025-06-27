@@ -45,7 +45,6 @@ out/
 # Recommended template: Node.gitignore
 
 docs/_book
-test/
 
 ### Vuejs ###
 # Recommended template: Node.gitignore
