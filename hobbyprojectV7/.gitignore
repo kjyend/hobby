@@ -55,6 +55,3 @@ dist/
 npm-debug.log
 yarn-error.log
 
-gradle
-gradlew
-gradlew.bat
